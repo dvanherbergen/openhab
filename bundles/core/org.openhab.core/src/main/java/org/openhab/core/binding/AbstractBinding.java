@@ -8,151 +8,143 @@
  */
 package org.openhab.core.binding;
 
-import java.util.Collection;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-import org.openhab.core.events.AbstractEventSubscriber;
 import org.openhab.core.events.EventPublisher;
+import org.openhab.core.items.Item;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Base class for bindings which send events.
- * 
- * @author Thomas.Eichstaedt-Engelen
- * @author Kai Kreuzer
- * @since 1.0.0
+ * Base class which should be extended by all Bindings.
  */
-public abstract class AbstractBinding<P extends BindingProvider> extends AbstractEventSubscriber implements BindingChangeListener {
-	
-	/** to keep track of all binding providers */
+public abstract class AbstractBinding<T extends AbstractBindingItemConfigProvider> implements
+		Binding<BindingItemConfigProvider> {
 
-	protected Collection<P> providers = new CopyOnWriteArraySet<P>();
-	
-	protected EventPublisher eventPublisher = null;
-	
-	
-	public void setEventPublisher(EventPublisher eventPublisher) {
+	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	private EventPublisher eventPublisher;
+
+	private ScheduledExecutorService scheduledExecutorService;
+
+	private List<Future<?>> scheduledServices = new ArrayList<Future<?>>();
+
+	private T bindingItemConfigProvider;
+
+	@Override
+	public final void setEventPublisher(EventPublisher eventPublisher) {
 		this.eventPublisher = eventPublisher;
 	}
 
-	public void unsetEventPublisher(EventPublisher eventPublisher) {
-		this.eventPublisher = null;
+	@Override
+	public final void setScheduledExecutorService(ScheduledExecutorService service) {
+		scheduledExecutorService = service;
 	}
 
-	public void activate() {};
-
-	public void deactivate() {};
-
-	/**
-	 * Adds <code>provider</code> to the list of {@link BindingProvider}s and 
-	 * adds <code>this</code> as {@link BindingChangeListener}. If 
-	 * <code>provider</code> contains any binding an the refresh-Thread is
-	 * stopped it will be started.
-	 * 
-	 * @param provider the new {@link BindingProvider} to add
-	 */
-	public void addBindingProvider(P provider) {
-		this.providers.add(provider);
-        provider.addBindingChangeListener(this);
-        allBindingsChanged(provider);
-    }
-
-	/**
-	 * Removes <code>provider</code> from the list of providers. If there is no
-	 * provider left the refresh thread is getting interrupted.
-	 * 
-	 * @param provider the {@link BindingProvider} to remove
-	 */
-	public void removeBindingProvider(P provider) {
-		this.providers.remove(provider);
-		provider.removeBindingChangeListener(this);
-	}
-	
-	
-	/**
-	 * @return <code>true</code> if any of the {@link BindingProvider}s provides
-	 * a binding
-	 */
-	protected boolean bindingsExist() {
-		for (BindingProvider provider : providers) {
-			if (provider.providesBinding()) {
-				return true;
+	@Override
+	public final void stopScheduledServices() {
+		for (Future<?> f : scheduledServices) {
+			if (!f.isDone()) {
+				f.cancel(true);
 			}
 		}
-		return false;
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public final T getBindingItemConfigProvider() {
+
+		if (bindingItemConfigProvider != null) {
+			return bindingItemConfigProvider;
+		}
+
+		// create new instance of the bindingItemConfigProvider
+		// we determine the type of item config provider from
+		// the return type of the method we are in.
+
+		try {
+
+			Method method = this.getClass().getMethod("getBindingItemConfigProvider");
+			ParameterizedType providerType = (ParameterizedType) method.getGenericReturnType();
+			Class<T> providerClass = (Class<T>) providerType.getActualTypeArguments()[0];
+			bindingItemConfigProvider = providerClass.newInstance();
+
+		} catch (Exception e) {
+			logger.error("Could not instantiate binding item provider class for binding.", e);
+		}
+
+		return bindingItemConfigProvider;
+	}
+
 	
-	/**
-	 * @{inheritDoc}
-	 */
+	
+	@Override
+	public final void processItemConfiguration(Item item, String configuration) throws BindingItemConfigException {				
+		getBindingItemConfigProvider().validateItemType(item, configuration);
+		getBindingItemConfigProvider().processBindingConfiguration(item, configuration);
+	}
+
 	@Override
 	public void receiveCommand(String itemName, Command command) {
-		// does any provider contain a binding config?
-		if (!providesBindingFor(itemName)) {
-			return;
-		}
-		internalReceiveCommand(itemName, command);
+		// doesn't do anything by default
+
 	}
-	
-	/**
-	 * Is called by <code>receiveCommand()</code> only if one of the 
-	 * {@link BindingProvider}s provide a binding for <code>itemName</code>.
-	 * 
-	 * @param itemName the item on which <code>command</code> will be executed
-	 * @param command the {@link Command} to be executed on <code>itemName</code>
-	 */
-	protected void internalReceiveCommand(String itemName, Command command) {};
-	
-	/**
-	 * @{inheritDoc}
-	 */
+
 	@Override
-	public void receiveUpdate(String itemName, State newState) {
-		// does any provider contain a binding config?
-		if (!providesBindingFor(itemName)) {
-			return;
-		}
-		internalReceiveUpdate(itemName, newState);
-	}
-	
-	/**
-	 * Is called by <code>receiveUpdate()</code> only if one of the 
-	 * {@link BindingProvider}s provide a binding for <code>itemName</code>.
-	 * 
-	 * @param itemName the item on which <code>command</code> will be executed
-	 * @param newState the {@link State} to be update
-	 */
-	protected void internalReceiveUpdate(String itemName, State newState) {};
-
-	/**
-	 * checks if any of the bindingProviders contains an adequate mapping
-	 * 
-	 * @param itemName the itemName to check
-	 * @return <code>true</code> if any of the bindingProviders contains an
-	 *         adequate mapping for <code>itemName</code> and <code>false</code>
-	 *         otherwise
-	 */
-	protected boolean providesBindingFor(String itemName) {
-		for (P provider : providers) {
-			if (provider.providesBindingFor(itemName)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public void allBindingsChanged(BindingProvider provider) {
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public void bindingChanged(BindingProvider provider, String itemName) {
+	public void receiveUpdate(String itemName, State state) {
+		// doesn't do anything by default
 	}
 
+	/**
+	 * Post command to the EventBus from the binding.
+	 * 
+	 * @param itemName
+	 * @param command
+	 */
+	protected final void postCommand(String itemName, Command command) {
+		eventPublisher.postCommand(itemName, command);
+	}
+
+	/**
+	 * Post a status updates to the EventBus.
+	 * 
+	 * @param itemName
+	 * @param state
+	 */
+	protected final void postUpdate(String itemName, State state) {
+		eventPublisher.postUpdate(itemName, state);
+	}
+
+	/**
+	 * Submit a service for immediate asynchronous execution.
+	 * 
+	 * @param service
+	 *            Runnable.
+	 */
+	protected final void submitTask(Runnable service) {
+		scheduledExecutorService.submit(service);
+	}
+
+	/**
+	 * Submit a task for repeating asynchronous execution. Repeating tasks are
+	 * executed by a thread pool which is shared across all bindings.
+	 * 
+	 * @param service
+	 *            Runnable.
+	 */
+	protected final Future<?> submitRepeatingTask(Runnable service, int period, TimeUnit unit) {
+		Future<?> f = scheduledExecutorService.scheduleAtFixedRate(service, 0, period, unit);
+		scheduledServices.add(f);
+		return f;
+	}
+
+	
 }

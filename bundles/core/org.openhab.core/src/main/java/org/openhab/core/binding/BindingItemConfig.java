@@ -6,14 +6,16 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.model.item.binding;
+package org.openhab.core.binding;
 
-public class BindingConfigParseException extends Exception {
-
-	private static final long serialVersionUID = 1434607160082879845L;
-
-	public BindingConfigParseException(String msg) {
-		super(msg);
-	}
+/**
+ * This is a simple marker interface to define data structures that are
+ * used as binding configurations.
+ * 
+ * @author Kai Kreuzer
+ * @since 0.6.0
+ *
+ */
+public interface BindingItemConfig {
 
 }

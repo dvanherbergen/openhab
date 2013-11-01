@@ -29,27 +29,31 @@
 package org.openhab.core.types;
 
 /**
- * Due to the duality of some types (which can be states and commands at the
- * same time), we need to be able to differentiate what the meaning of a
- * message on the bus is - does "item ON" mean that its state has changed to
- * ON or that it should turn itself ON? To decide this, we send the event
- * type as an additional information on the event bus for each message.
+ * SystemEventType defines all possible types of system events which are sent on
+ * the event bus.
  * 
- * @author Kai Kreuzer
  * @author Davy Vanherbergen
- * @since 0.1.0
- *
+ * @since 1.4.0
  */
-public enum EventType {
-	COMMAND, UPDATE, SYSTEM;
-	
-	public String toString() {
-		switch(this) {
-			case COMMAND: return "command";
-			case UPDATE:  return "update";
-			case SYSTEM: return "system";
-		}
-		return "";
-	}
+public enum SystemEventType {
 
+	
+	// TODO do we need all of these??
+	
+	
+	/** 
+	 * Event sent when all configuration folders haven been 
+	 * read for the first time.	
+	 */ 
+	BINDING_CONFIGURATION_READ,
+	
+	/**
+	 * Event sent when all bindings have processed the (new) item configurations.
+	 */
+	BINDING_CONFIGURATION_PROCESSED,
+	
+	/**
+	 * Event sent when everything is started and rules can be executed.
+	 */
+	SYSTEM_STARTED
 }

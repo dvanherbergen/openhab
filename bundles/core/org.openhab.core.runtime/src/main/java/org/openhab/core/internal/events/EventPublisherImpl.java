@@ -18,6 +18,7 @@ import org.openhab.core.events.EventPublisher;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.EventType;
 import org.openhab.core.types.State;
+import org.openhab.core.types.SystemEventType;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
  * in order to broadcast them.
  * 
  * @author Kai Kreuzer
+ * @author Davy Vanherbergen
  *
  */
 public class EventPublisherImpl implements EventPublisher {
@@ -53,7 +55,7 @@ public class EventPublisherImpl implements EventPublisher {
 	 */
 	public void sendCommand(String itemName, Command command) {
 		if (command != null) {
-			if(eventAdmin!=null) eventAdmin.sendEvent(createCommandEvent(itemName, command));
+			if(eventAdmin!=null) eventAdmin.sendEvent(createSyncCommandEvent(itemName, command));
 		} else {
 			logger.warn("given command is NULL, couldn't send command to '{}'", itemName);
 		}
@@ -95,9 +97,39 @@ public class EventPublisherImpl implements EventPublisher {
 		return new Event(createTopic(EventType.COMMAND, itemName) , properties);
 	}
 
+	/**
+	 * Create a new synchronous command event. This command is to be executed
+	 * synchronously in the thread of the command sender.
+	 * 
+	 * @param itemName
+	 *            name of the item for which the command is intended
+	 * @param command
+	 *            openHAB command
+	 * @return Event which can be sent on the event bus.
+	 */
+	private Event createSyncCommandEvent(String itemName, Command command) {
+		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		properties.put("item", itemName);
+		properties.put("command", command);
+		properties.put("sync", Boolean.TRUE);
+		return new Event(createTopic(EventType.COMMAND, itemName), properties);
+	}
+	
 	private String createTopic(EventType type, String itemName) {
 		return TOPIC_PREFIX + TOPIC_SEPERATOR + type + TOPIC_SEPERATOR + itemName;
 	}
-	
+
+	@Override
+	public void postSystemEvent(SystemEventType event) {
+		
+		if (eventAdmin==null) {
+			logger.error("Cannot send system event '{}'. Event admin is not available.", event);
+			return;
+		}
+		
+		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		properties.put("event", event);
+		eventAdmin.postEvent(new Event(TOPIC_PREFIX + TOPIC_SEPERATOR + EventType.SYSTEM, properties));		
+	}
 	
 }
