@@ -8,15 +8,14 @@
  */
 package org.openhab.binding.koubachi.internal;
 
-import org.openhab.binding.koubachi.KoubachiBindingProvider;
 import org.openhab.binding.koubachi.internal.api.KoubachiResourceType;
-import org.openhab.core.binding.BindingConfig;
+import org.openhab.core.binding.AbstractBindingItemConfigProvider;
+import org.openhab.core.binding.BindingItemConfig;
+import org.openhab.core.binding.BindingItemConfigException;
 import org.openhab.core.items.Item;
 import org.openhab.core.library.items.DateTimeItem;
 import org.openhab.core.library.items.NumberItem;
 import org.openhab.core.library.items.StringItem;
-import org.openhab.model.item.binding.AbstractGenericBindingProvider;
-import org.openhab.model.item.binding.BindingConfigParseException;
 
 
 /**
@@ -35,7 +34,7 @@ import org.openhab.model.item.binding.BindingConfigParseException;
  * @author Thomas.Eichstaedt-Engelen
  * @since 1.2.0
  */
-public class KoubachiGenericBindingProvider extends AbstractGenericBindingProvider implements KoubachiBindingProvider {
+public class KoubachiBindingItemProvider extends AbstractBindingItemConfigProvider { 
 
 	/**
 	 * {@inheritDoc}
@@ -47,10 +46,9 @@ public class KoubachiGenericBindingProvider extends AbstractGenericBindingProvid
 	/**
 	 * @{inheritDoc}
 	 */
-	@Override
-	public void validateItemType(Item item, String bindingConfig) throws BindingConfigParseException {
+	public void validateItemType(Item item, String bindingConfig) throws BindingItemConfigException {
 		if (!(item instanceof NumberItem || item instanceof StringItem || item instanceof DateTimeItem)) {
-			throw new BindingConfigParseException("item '" + item.getName()
+			throw new BindingItemConfigException("item '" + item.getName()
 					+ "' is of type '" + item.getClass().getSimpleName()
 					+ "', only Number-, String- and DateTimeItems are allowed - please check your *.items configuration");
 		}
@@ -60,12 +58,11 @@ public class KoubachiGenericBindingProvider extends AbstractGenericBindingProvid
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void processBindingConfiguration(String context, Item item, String bindingConfig) throws BindingConfigParseException {
-		super.processBindingConfiguration(context, item, bindingConfig);
+	public void processBindingConfiguration(Item item, String bindingConfig) throws BindingItemConfigException {
 	
 		String[] configParts = bindingConfig.split(":");
 		if (configParts.length != 3) {
-			throw new BindingConfigParseException("A Koubachi binding configuration must consist of three parts - please verify your *.items file");
+			throw new BindingItemConfigException("A Koubachi binding configuration must consist of three parts - please verify your *.items file");
 		}
 		
 		KoubachiBindingConfig config = new KoubachiBindingConfig();
@@ -78,27 +75,33 @@ public class KoubachiGenericBindingProvider extends AbstractGenericBindingProvid
 	
 	
 	/**
-	 * {@inheritDoc}
+	 * Returns the configured Koubachi resource type of the given {@code itemName}.
+	 * 
+	 * @param itemName the item for which to find a resource type.
+	 * @return the type of the Item identified by {@code itemName}
 	 */
-	@Override
 	public KoubachiResourceType getResourceType(String itemName) {
 		KoubachiBindingConfig config = (KoubachiBindingConfig) bindingConfigs.get(itemName);
 		return config != null ? config.resourceType: null;
 	}
 	
 	/**
-	 * {@inheritDoc}
+	 * Returns the configured Koubachi resource id of the given {@code itemName}.
+	 * 
+	 * @param itemName the item for which to find a resource id.
+	 * @return the resource id of the {@link Item} identified by {@code itemName}
 	 */
-	@Override
 	public String getResourceId(String itemName) {
 		KoubachiBindingConfig config = (KoubachiBindingConfig) bindingConfigs.get(itemName);
 		return config != null ? config.resourceId: null;
 	}
 	
 	/**
-	 * {@inheritDoc}
+	 * Returns the configured Koubachi property name of the given {@code itemName}.
+	 * 
+	 * @param itemName the item for which to find a property name.
+	 * @return the property name of the {@link Item} identified by {@code itemName}
 	 */
-	@Override
 	public String getPropertyName(String itemName) {
 		KoubachiBindingConfig config = (KoubachiBindingConfig) bindingConfigs.get(itemName);
 		return config != null ? config.propertyName: null;
@@ -109,7 +112,7 @@ public class KoubachiGenericBindingProvider extends AbstractGenericBindingProvid
 	 * @author Thomas.Eichstaedt-Engelen
 	 * @since 1.2.0
 	 */
-	class KoubachiBindingConfig implements BindingConfig {
+	class KoubachiBindingConfig implements BindingItemConfig {
 		
 		KoubachiResourceType resourceType;
 		String resourceId;

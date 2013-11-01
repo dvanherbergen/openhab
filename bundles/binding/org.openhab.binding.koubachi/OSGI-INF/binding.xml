@@ -13,10 +13,7 @@
    <implementation class="org.openhab.binding.koubachi.internal.KoubachiBinding"/>
    
    <service>
-      <provide interface="org.osgi.service.cm.ManagedService"/>
+      <provide interface="org.openhab.core.binding.Binding"/>
    </service>
-   <property name="service.pid" type="String" value="org.openhab.koubachi"/>
    
-   <reference bind="setEventPublisher" cardinality="1..1" interface="org.openhab.core.events.EventPublisher" name="EventPublisher" policy="dynamic" unbind="unsetEventPublisher"/>
-   <reference bind="addBindingProvider" cardinality="1..n" interface="org.openhab.binding.koubachi.KoubachiBindingProvider" name="KoubachiBindingProvider" policy="dynamic" unbind="removeBindingProvider"/>
 </scr:component>

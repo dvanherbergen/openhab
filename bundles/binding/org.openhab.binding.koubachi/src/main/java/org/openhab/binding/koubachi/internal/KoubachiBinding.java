@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -21,19 +20,17 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import org.openhab.binding.koubachi.KoubachiBindingProvider;
 import org.openhab.binding.koubachi.internal.api.Device;
 import org.openhab.binding.koubachi.internal.api.KoubachiResource;
 import org.openhab.binding.koubachi.internal.api.KoubachiResourceType;
 import org.openhab.binding.koubachi.internal.api.Plant;
 import org.openhab.core.binding.AbstractActiveBinding;
+import org.openhab.core.binding.BindingException;
 import org.openhab.core.library.types.DateTimeType;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.StringType;
 import org.openhab.core.types.State;
 import org.openhab.io.net.http.HttpUtil;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 	
@@ -44,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author Thomas.Eichstaedt-Engelen
  * @since 1.2.0
  */
-public class KoubachiBinding extends AbstractActiveBinding<KoubachiBindingProvider> implements ManagedService {
+public class KoubachiBinding extends AbstractActiveBinding<KoubachiBindingItemProvider> {
 
 	private static final Logger logger =  LoggerFactory.getLogger(KoubachiBinding.class);
 	
@@ -52,7 +49,7 @@ public class KoubachiBinding extends AbstractActiveBinding<KoubachiBindingProvid
 	private static final int HTTP_REQUEST_TIMEOUT = 10000;
 	
 	/** the refresh interval which is used to poll values from the Koubachi server (optional, defaults to 900000ms, 15m) */
-	private static long refreshInterval = 900000;
+	private static int refreshInterval = 900000;
 	
 	/** the URL of the Device list  (optional, defaults to 'https://api.koubachi.com/v2/user/smart_devices?user_credentials=%1$s&app_key=%2$s') */
 	private static String apiDeviceListUrl = "https://api.koubachi.com/v2/user/smart_devices?user_credentials=%1$s&app_key=%2$s";
@@ -66,20 +63,13 @@ public class KoubachiBinding extends AbstractActiveBinding<KoubachiBindingProvid
 	/** The personal appKey configured at http://labs.koubachi.com */
  	private static String appKey;
 	
- 	
-	/**
-	 * @{inheritDoc}
-	 */
-	@Override
-	protected String getName() {
-		return "Koubachi Refresh Service";
-	}
+
 	
 	/**
 	 * @{inheritDoc}
 	 */
 	@Override
-	protected long getRefreshInterval() {
+	protected int getRefreshInterval() {
 		return refreshInterval;
 	}
 	
@@ -92,33 +82,32 @@ public class KoubachiBinding extends AbstractActiveBinding<KoubachiBindingProvid
 		List<Device> devices = getDevices(apiDeviceListUrl, credentials, appKey);
 		List<Plant> plants = getPlants(apiPlantListUrl, credentials, appKey);
 		
-		for (KoubachiBindingProvider provider : providers) {
-			for (String itemName : provider.getItemNames()) {
-				KoubachiResourceType resourceType = provider.getResourceType(itemName);
-				String resourceId = provider.getResourceId(itemName);
-				String propertyName = provider.getPropertyName(itemName);
-				
-				KoubachiResource resource = null;
-				if (KoubachiResourceType.DEVICE.equals(resourceType)) {
-					resource = findResource(resourceId, devices);
-				} else {
-					resource = findResource(resourceId, plants);
+		KoubachiBindingItemProvider provider = getBindingItemConfigProvider();
+		for (String itemName : provider.getItemNames()) {
+			KoubachiResourceType resourceType = provider.getResourceType(itemName);
+			String resourceId = provider.getResourceId(itemName);
+			String propertyName = provider.getPropertyName(itemName);
+			
+			KoubachiResource resource = null;
+			if (KoubachiResourceType.DEVICE.equals(resourceType)) {
+				resource = findResource(resourceId, devices);
+			} else {
+				resource = findResource(resourceId, plants);
+			}
+			
+			if (resource == null) {
+				logger.debug("Cannot find Koubachi resource with id '{}'", resourceId);
+				continue;
+			}
+			
+			try {
+				Object propertyValue = PropertyUtils.getProperty(resource, propertyName);
+				State state = createState(propertyValue.getClass(), propertyValue);
+				if (state != null) {
+					postUpdate(itemName, state);
 				}
-				
-				if (resource == null) {
-					logger.debug("Cannot find Koubachi resource with id '{}'", resourceId);
-					continue;
-				}
-				
-				try {
-					Object propertyValue = PropertyUtils.getProperty(resource, propertyName);
-					State state = createState(propertyValue.getClass(), propertyValue);
-					if (state != null) {
-						eventPublisher.postUpdate(itemName, state);
-					}
-				} catch (Exception e) {
-					logger.warn("Reading value '{}' from Resource '{}' throws went wrong", propertyName, resource);
-				}
+			} catch (Exception e) {
+				logger.warn("Reading value '{}' from Resource '{}' throws went wrong", propertyName, resource);
 			}
 		}
 	}
@@ -232,13 +221,19 @@ public class KoubachiBinding extends AbstractActiveBinding<KoubachiBindingProvid
 		}
 	}
 	
-	
 	@Override
-	public void updated(Dictionary<String, ?> config) throws ConfigurationException {
+	public String getId() {
+		return "koubachi";
+	}
+
+	@Override
+	public void processBindingProperties(Properties config)
+			throws BindingException {
+
 		if (config != null) {
 			String refreshIntervalString = (String) config.get("refresh");
 			if (StringUtils.isNotBlank(refreshIntervalString)) {
-				refreshInterval = Long.parseLong(refreshIntervalString);
+				refreshInterval = Integer.parseInt(refreshIntervalString);
 			}
 			
 			String apiDeviceUrlString = (String) config.get("deviceurl");
@@ -252,11 +247,11 @@ public class KoubachiBinding extends AbstractActiveBinding<KoubachiBindingProvid
 			
 			credentials = (String) config.get("credentials");
 			if (StringUtils.isBlank(credentials)) {
-				throw new ConfigurationException("koubachi:credentials", "Users' credentials parameter must be set");
+				throw new BindingException("koubachi:credentials", "Users' credentials parameter must be set");
 			}
 			appKey = (String) config.get("appkey");
 			if (StringUtils.isBlank(appKey)) {
-				throw new ConfigurationException("koubachi:appkey", "AppKey parameter must be set");
+				throw new BindingException("koubachi:appkey", "AppKey parameter must be set");
 			}
 			
 			setProperlyConfigured(true);
