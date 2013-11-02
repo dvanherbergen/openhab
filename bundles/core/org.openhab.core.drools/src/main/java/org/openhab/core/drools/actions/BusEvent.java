@@ -8,11 +8,11 @@
  */
 package org.openhab.core.drools.actions;
 
+
 import org.openhab.core.drools.internal.RulesActivator;
-import org.openhab.core.events.EventPublisher;
+import org.openhab.core.events.InternalEventPublisher;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
-import org.openhab.core.items.ItemNotUniqueException;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
@@ -36,7 +36,7 @@ public class BusEvent {
 	
 	static public void sendCommand(String itemName, String commandString) {
 		ItemRegistry registry = (ItemRegistry) RulesActivator.itemRegistryTracker.getService();
-		EventPublisher publisher = (EventPublisher) RulesActivator.eventPublisherTracker.getService();
+		InternalEventPublisher publisher = (InternalEventPublisher) RulesActivator.eventPublisherTracker.getService();
 		if(publisher!=null && registry!=null) {
 			try {
 				Item item = registry.getItem(itemName);
@@ -50,7 +50,7 @@ public class BusEvent {
 
 	static public void postUpdate(String itemName, String stateString) {
 		ItemRegistry registry = (ItemRegistry) RulesActivator.itemRegistryTracker.getService();
-		EventPublisher publisher = (EventPublisher) RulesActivator.eventPublisherTracker.getService();
+		InternalEventPublisher publisher = (InternalEventPublisher) RulesActivator.eventPublisherTracker.getService();
 		if(publisher!=null && registry!=null) {
 			try {
 				Item item = registry.getItem(itemName);

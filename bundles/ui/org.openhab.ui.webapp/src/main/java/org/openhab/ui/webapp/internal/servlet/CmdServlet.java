@@ -15,7 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.openhab.core.events.EventPublisher;
+import org.eclipse.smarthome.events.EventPublisher;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
@@ -92,7 +92,7 @@ public class CmdServlet extends BaseServlet {
 					
 					Command command = TypeParser.parseCommand(item.getAcceptedCommandTypes(), commandName);
 					if(command!=null) {
-						eventPublisher.sendCommand(itemName, command);
+						eventPublisher.postCommand(itemName, command);
 					} else {
 						logger.warn("Received unknown command '{}' for item '{}'", commandName, itemName);						
 					}

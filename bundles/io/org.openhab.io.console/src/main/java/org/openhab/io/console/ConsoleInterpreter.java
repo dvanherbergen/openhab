@@ -11,7 +11,7 @@ package org.openhab.io.console;
 import java.util.Collection;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.openhab.core.events.EventPublisher;
+import org.eclipse.smarthome.events.EventPublisher;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemNotUniqueException;
@@ -137,7 +137,7 @@ public class ConsoleInterpreter {
 							String commandName = args[1];
 							Command command = TypeParser.parseCommand(item.getAcceptedCommandTypes(), commandName);
 							if(command!=null) {
-								publisher.sendCommand(itemName, command);
+								publisher.postCommand(itemName, command);
 								console.println("Command has been sent successfully.");
 							} else {
 								console.println("Error: Command '" + commandName +

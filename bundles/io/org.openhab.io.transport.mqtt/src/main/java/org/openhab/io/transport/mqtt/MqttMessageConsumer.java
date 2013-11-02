@@ -8,7 +8,7 @@
  */
 package org.openhab.io.transport.mqtt;
 
-import org.openhab.core.events.EventPublisher;
+import org.eclipse.smarthome.events.EventPublisher;
 
 /**
  * All message consumers which want to register as a message consumer to a

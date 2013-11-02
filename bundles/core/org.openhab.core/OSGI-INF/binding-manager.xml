@@ -30,11 +30,10 @@
 
 -->
 
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" immediate="true" name="org.openhab.core.binding">
-   <implementation class="org.openhab.core.internal.BindingManager"/>
-   
-   <reference bind="setEventPublisher" cardinality="1..1" interface="org.openhab.core.events.EventPublisher" name="EventPublisher" policy="dynamic" unbind="unsetEventPublisher"/>   
-   <reference bind="addBinding" cardinality="1..1" interface="org.openhab.core.binding.Binding" name="Binding" policy="static" unbind="removeBinding"/>
-   <reference bind="addBindingConfigurationListener" cardinality="1..1" interface="org.openhab.core.binding.BindingConfigurationListener" name="BindingConfigurationListener" policy="static" unbind="removeBindingConfigurationListener"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" immediate="true" name="org.eclipse.smarthome.binding.bindingmanager">
+   <implementation class="org.eclipse.smarthome.internal.binding.BindingManager"/>   
+   <reference bind="setThreadPoolService" cardinality="1..1" interface="org.eclipse.smarthome.services.threading.ThreadPoolService" name="ThreadPoolService" policy="static" unbind="unsetThreadPoolService"/>
+   <reference bind="setConfigurationManager" cardinality="1..1" interface="org.eclipse.smarthome.internal.binding.ConfigurationManager" name="ConfigurationManager" policy="static" unbind="unsetConfigurationManager"/>
+   <reference bind="registerBinding" cardinality="0..n" interface="org.eclipse.smarthome.binding.Binding" name="Binding" policy="dynamic" unbind="unregisterBinding"/>
    
 </scr:component>

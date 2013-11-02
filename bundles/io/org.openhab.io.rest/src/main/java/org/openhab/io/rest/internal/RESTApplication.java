@@ -17,7 +17,7 @@ import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
 
 import org.atmosphere.cpr.AtmosphereServlet;
-import org.openhab.core.events.EventPublisher;
+import org.eclipse.smarthome.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.io.net.http.SecureHttpContext;
 import org.openhab.io.rest.internal.resources.ItemResource;

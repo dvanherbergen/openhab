@@ -33,10 +33,10 @@ import org.openhab.core.types.State;
 import org.openhab.core.types.SystemEventType;
 
 /**
- * An EventSubscriber receives events from the openHAB event bus for further processing.
+ * An EventSubscriber receives events from the openHAB event bus for further
+ * processing.
  * 
  * @author Kai Kreuzer
- * @author Davy Vanherbergen
  * @since 0.1.0
  */
 public interface EventSubscriber {
@@ -44,24 +44,21 @@ public interface EventSubscriber {
 	/**
 	 * Callback method if a command was sent on the event bus
 	 * 
-	 * @param itemName the item for which a command was sent
-	 * @param command the command that was sent
+	 * @param itemName
+	 *            the item for which a command was sent
+	 * @param command
+	 *            the command that was sent
 	 */
 	public void receiveCommand(String itemName, Command command);
-	
+
 	/**
 	 * Callback method if a state update was sent on the event bus
 	 * 
-	 * @param itemName the item for which a state update was sent
-	 * @param state the state that was sent
+	 * @param itemName
+	 *            the item for which a state update was sent
+	 * @param state
+	 *            the state that was sent
 	 */
 	public void receiveUpdate(String itemName, State newStatus);
-
-	/**
-	 * Callback method if a system event was sent on the event bus.
-	 * 
-	 * @param system event which was sent.
-	 */
-	public void receiveSystemEvent(SystemEventType sysEvent);
 
 }

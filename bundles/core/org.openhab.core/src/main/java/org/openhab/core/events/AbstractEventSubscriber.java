@@ -33,12 +33,9 @@ import static org.openhab.core.events.EventConstants.TOPIC_SEPERATOR;
 
 import java.util.concurrent.ExecutorService;
 
-import org.openhab.core.internal.CoreActivator;
-import org.openhab.core.threading.ThreadPoolService;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.EventType;
 import org.openhab.core.types.State;
-import org.openhab.core.types.SystemEventType;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -51,9 +48,7 @@ abstract public class AbstractEventSubscriber implements EventSubscriber, EventH
 	 */
 	public void handleEvent(Event event) {  
 		
-		if (executorService == null) {
-			executorService = CoreActivator.threadPoolServiceTracker.getService().getExecutor(ThreadPoolService.EVENT_POOL_EXECUTOR);
-		}
+// TODO davy
 		
 		final String itemName = (String) event.getProperty("item");
 		
@@ -93,17 +88,6 @@ abstract public class AbstractEventSubscriber implements EventSubscriber, EventH
 			}
 		}
 		
-		if(operation.equals(EventType.SYSTEM.toString())) {
-			final SystemEventType systemEvent = (SystemEventType) event.getProperty("event");
-			if (systemEvent != null) {
-				executorService.submit(new Runnable() {
-					@Override
-					public void run() {
-						receiveSystemEvent(systemEvent);							
-					}
-				});				
-			}
-		}
 	}
 	
 	/**
@@ -120,8 +104,4 @@ abstract public class AbstractEventSubscriber implements EventSubscriber, EventH
 		// default implementation: do nothing
 	}
 
-	@Override
-	public void receiveSystemEvent(SystemEventType sysEvent) {
-		// default implementation: do nothing
-	}
 }

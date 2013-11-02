@@ -18,17 +18,16 @@ Require-Bundle: org.eclipse.xtext,
  org.antlr.runtime
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.openhab.model,
- org.openhab.model.item.binding,
+ org.openhab.model.formatting,
  org.openhab.model.items,
  org.openhab.model.items.impl,
+ org.openhab.model.items.util,
  org.openhab.model.parseTreeConstruction,
  org.openhab.model.parser.antlr,
  org.openhab.model.parser.antlr.internal,
- org.openhab.model.services,
- org.openhab.model.validation,
- org.openhab.model.items.util,
  org.openhab.model.scoping,
- org.openhab.model.formatting
+ org.openhab.model.services,
+ org.openhab.model.validation
 Import-Package: org.apache.log4j,
  org.openhab.core.binding,
  org.openhab.core.items,
@@ -37,6 +36,7 @@ Import-Package: org.apache.log4j,
  org.openhab.core.scriptengine,
  org.openhab.core.types,
  org.openhab.model.core,
+ org.openhab.model.item.binding,
  org.osgi.framework,
  org.slf4j
 Bundle-Activator: org.openhab.model.item.internal.ItemModelActivator

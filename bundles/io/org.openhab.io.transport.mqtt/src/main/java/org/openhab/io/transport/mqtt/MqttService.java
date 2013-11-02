@@ -13,7 +13,7 @@ import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.StringUtils;
-import org.openhab.core.events.EventPublisher;
+import org.eclipse.smarthome.events.EventPublisher;
 import org.openhab.io.transport.mqtt.internal.MqttBrokerConnection;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;

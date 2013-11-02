@@ -14,11 +14,10 @@ import static org.openhab.core.events.EventConstants.TOPIC_SEPERATOR;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import org.openhab.core.events.EventPublisher;
+import org.eclipse.smarthome.events.EventPublisher;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.EventType;
 import org.openhab.core.types.State;
-import org.openhab.core.types.SystemEventType;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
@@ -30,7 +29,6 @@ import org.slf4j.LoggerFactory;
  * in order to broadcast them.
  * 
  * @author Kai Kreuzer
- * @author Davy Vanherbergen
  *
  */
 public class EventPublisherImpl implements EventPublisher {
@@ -108,6 +106,7 @@ public class EventPublisherImpl implements EventPublisher {
 	 * @return Event which can be sent on the event bus.
 	 */
 	private Event createSyncCommandEvent(String itemName, Command command) {
+		// TODO davy
 		Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put("item", itemName);
 		properties.put("command", command);
@@ -119,17 +118,5 @@ public class EventPublisherImpl implements EventPublisher {
 		return TOPIC_PREFIX + TOPIC_SEPERATOR + type + TOPIC_SEPERATOR + itemName;
 	}
 
-	@Override
-	public void postSystemEvent(SystemEventType event) {
-		
-		if (eventAdmin==null) {
-			logger.error("Cannot send system event '{}'. Event admin is not available.", event);
-			return;
-		}
-		
-		Dictionary<String, Object> properties = new Hashtable<String, Object>();
-		properties.put("event", event);
-		eventAdmin.postEvent(new Event(TOPIC_PREFIX + TOPIC_SEPERATOR + EventType.SYSTEM, properties));		
-	}
 	
 }
