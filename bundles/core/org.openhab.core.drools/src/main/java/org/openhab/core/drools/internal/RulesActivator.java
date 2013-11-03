@@ -8,7 +8,7 @@
  */
 package org.openhab.core.drools.internal;
 
-import org.openhab.core.events.InternalEventPublisher;
+import org.eclipse.smarthome.core.events.InternalEventPublisher;
 import org.openhab.core.items.ItemRegistry;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;

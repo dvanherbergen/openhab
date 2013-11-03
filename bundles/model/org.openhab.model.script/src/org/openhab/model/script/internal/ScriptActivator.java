@@ -8,7 +8,7 @@
  */
 package org.openhab.model.script.internal;
 
-import org.openhab.core.events.InternalEventPublisher;
+import org.eclipse.smarthome.core.events.InternalEventPublisher;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.scriptengine.ScriptEngine;
 import org.openhab.core.scriptengine.action.ActionService;

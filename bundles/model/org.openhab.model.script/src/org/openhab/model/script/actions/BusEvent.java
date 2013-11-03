@@ -11,7 +11,7 @@ package org.openhab.model.script.actions;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.openhab.core.events.InternalEventPublisher;
+import org.eclipse.smarthome.core.events.InternalEventPublisher;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;

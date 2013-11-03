@@ -31,9 +31,8 @@
 -->
 
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" immediate="true" name="org.eclipse.smarthome.binding.bindingmanager">
-   <implementation class="org.eclipse.smarthome.internal.binding.BindingManager"/>   
-   <reference bind="setThreadPoolService" cardinality="1..1" interface="org.eclipse.smarthome.services.threading.ThreadPoolService" name="ThreadPoolService" policy="static" unbind="unsetThreadPoolService"/>
-   <reference bind="setConfigurationManager" cardinality="1..1" interface="org.eclipse.smarthome.internal.binding.ConfigurationManager" name="ConfigurationManager" policy="static" unbind="unsetConfigurationManager"/>
-   <reference bind="registerBinding" cardinality="0..n" interface="org.eclipse.smarthome.binding.Binding" name="Binding" policy="dynamic" unbind="unregisterBinding"/>
+   <implementation class="org.eclipse.smarthome.core.internal.binding.BindingManager"/>   
+   <reference bind="setThreadPoolService" cardinality="1..1" interface="org.eclipse.smarthome.api.services.threading.ThreadPoolService" name="ThreadPoolService" policy="static" unbind="unsetThreadPoolService"/>
+   <reference bind="registerBinding" cardinality="0..n" interface="org.eclipse.smarthome.api.binding.Binding" name="Binding" policy="dynamic" unbind="unregisterBinding"/>
    
 </scr:component>

@@ -8,9 +8,6 @@
  */
 package org.openhab.core.drools.internal;
 
-import static org.openhab.core.events.EventConstants.TOPIC_PREFIX;
-import static org.openhab.core.events.EventConstants.TOPIC_SEPERATOR;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,6 +32,8 @@ import org.drools.io.ResourceChangeScannerConfiguration;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
+import org.eclipse.smarthome.core.events.EventSubscriber;
+import org.eclipse.smarthome.core.events.types.SystemEvent;
 import org.openhab.core.drools.event.CommandEvent;
 import org.openhab.core.drools.event.RuleEvent;
 import org.openhab.core.drools.event.StateEvent;
@@ -46,16 +45,13 @@ import org.openhab.core.items.ItemRegistryChangeListener;
 import org.openhab.core.items.StateChangeListener;
 import org.openhab.core.service.AbstractActiveService;
 import org.openhab.core.types.Command;
-import org.openhab.core.types.EventType;
 import org.openhab.core.types.State;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RuleService extends AbstractActiveService implements ManagedService, EventHandler, ItemRegistryChangeListener, StateChangeListener {
+public class RuleService extends AbstractActiveService implements ManagedService, EventSubscriber, ItemRegistryChangeListener, StateChangeListener {
 
 	private static final String RULES_CHANGESET = "org/openhab/core/drools/changeset.xml";
 
@@ -200,6 +196,7 @@ public class RuleService extends AbstractActiveService implements ManagedService
 		eventQueue.add(new StateEvent(item, state));
 	}
 
+	@Override
 	public void receiveCommand(String itemName, Command command) {
 		try {
 			Item item = itemRegistry.getItem(itemName);
@@ -287,27 +284,7 @@ public class RuleService extends AbstractActiveService implements ManagedService
 	protected String getName() {
 		return "Rule Evaluation Service";
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void handleEvent(Event event) {  
-		String itemName = (String) event.getProperty("item");
-		
-		String topic = event.getTopic();
-		String[] topicParts = topic.split(TOPIC_SEPERATOR);
-		
-		if(!(topicParts.length > 2) || !topicParts[0].equals(TOPIC_PREFIX)) {
-			return; // we have received an event with an invalid topic
-		}
-		String operation = topicParts[1];
-		
-		if(operation.equals(EventType.COMMAND.toString())) {
-			Command command = (Command) event.getProperty("command");
-			if(command!=null) receiveCommand(itemName, command);
-		}
-	}
-
+	
 	static private final class RuleEventListener implements SystemEventListener {
 		
 		private final Logger logger = LoggerFactory.getLogger(SystemEventListener.class);
@@ -343,6 +320,16 @@ public class RuleService extends AbstractActiveService implements ManagedService
 		public void debug(String message) {
 			logger.debug(message);
 		}
+	}
+
+	@Override
+	public void receiveUpdate(String itemName, State newStatus) {
+		// don't care about states
+	}
+
+	@Override
+	public void receiveSystemEvent(SystemEvent systemEvent) {
+		// don't care about system events
 	}
 
 }

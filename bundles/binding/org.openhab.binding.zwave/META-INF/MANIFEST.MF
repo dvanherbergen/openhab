@@ -12,6 +12,7 @@ Bundle-Description: This is the ZWave binding of the open Home Aut
  omation Bus (openHAB)
 Import-Package: gnu.io,
  org.apache.commons.lang,
+ org.eclipse.smarthome.events,
  org.openhab.core.autoupdate,
  org.openhab.core.binding,
  org.openhab.core.events,

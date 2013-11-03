@@ -11,13 +11,13 @@ Bundle-License: http://www.eclipse.org/legal/epl-v10.html
 Bundle-Description: This is the rule support of the open Home Aut
  omation Bus (openHAB)
 Import-Package: org.apache.commons.lang,
- org.eclipse.smarthome.events,
+ org.eclipse.smarthome.api.events,
+ org.eclipse.smarthome.core.events,
+ org.eclipse.smarthome.core.events.types,
  org.openhab.core.drools.actions,
- org.openhab.core.events,
  org.openhab.core.items,
  org.openhab.core.library.items,
  org.openhab.core.library.types,
- org.openhab.core.service,
  org.openhab.core.transform.actions,
  org.openhab.core.types,
  org.openhab.io.multimedia.actions,

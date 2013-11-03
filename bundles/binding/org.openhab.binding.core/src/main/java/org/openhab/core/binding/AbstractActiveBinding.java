@@ -44,9 +44,8 @@ public abstract class AbstractActiveBinding<P extends BindingProvider> extends A
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractActiveBinding.class);
 
-	/** embedded active service to allow the binding to have some code executed in a given interval. */
-	protected AbstractActiveService activeService = new BindingActiveService();
 
+	// TODO only still exists here to stop compile errors...
 	
 	/**
 	 * Adds <code>provider</code> to the list of {@link BindingProvider}s and 
@@ -57,8 +56,7 @@ public abstract class AbstractActiveBinding<P extends BindingProvider> extends A
 	 * @param provider the new {@link BindingProvider} to add
 	 */
 	public void addBindingProvider(P provider) {
-		super.addBindingProvider(provider);
-		activeService.activate();
+
 	}
 
 	/**
@@ -68,39 +66,21 @@ public abstract class AbstractActiveBinding<P extends BindingProvider> extends A
 	 * @param provider the {@link BindingProvider} to remove
 	 */
 	public void removeBindingProvider(P provider) {
-		super.removeBindingProvider(provider);
-		
-		// if there are no binding providers there is no need to run this 
-		// refresh thread any longer ...
-		if (this.providers.size() == 0) {
-			activeService.deactivate();
-		}
+
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void bindingChanged(BindingProvider provider, String itemName) {
-		super.bindingChanged(provider, itemName);
-		
-		if (bindingsExist()) {
-			activeService.activate();
-		} else {
-			activeService.deactivate();
-		}
+
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void allBindingsChanged(BindingProvider provider) {
-		super.allBindingsChanged(provider);
-		
-		if (bindingsExist()) {
-			activeService.activate();
-		} else {
-			activeService.deactivate();
-		}
+
 	}
 	
 	/**
@@ -112,9 +92,7 @@ public abstract class AbstractActiveBinding<P extends BindingProvider> extends A
 	 * @param properlyConfigured
 	 */
 	protected void setProperlyConfigured(boolean properlyConfigured) {
-		if (providers.size() > 0) {
-			activeService.setProperlyConfigured(properlyConfigured);
-		}
+		
 	}
 	
 	/**
@@ -122,7 +100,7 @@ public abstract class AbstractActiveBinding<P extends BindingProvider> extends A
 	 * that all necessary data is available
 	 */
 	protected boolean isProperlyConfigured() {
-		return activeService.isProperlyConfigured();
+		return false;
 	}
 	
 	/**
@@ -147,44 +125,5 @@ public abstract class AbstractActiveBinding<P extends BindingProvider> extends A
 	protected abstract String getName();
 	
 	
-	/** private inner class, which delegates method calls to the outer binding instance */
-	private class BindingActiveService extends AbstractActiveService {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected void start() {
-			super.start();
-		}
-
-		/**
-		 * @{inheritDoc}
-		 */
-		@Override
-		public void interrupt() {
-			if (!bindingsExist()) {
-				super.interrupt();
-			} else {
-				logger.trace("{} won't be interrupted because bindings exist.", getName());
-			}
-		}
-
-		@Override
-		protected void execute() {
-			AbstractActiveBinding.this.execute();
-		}
-
-		@Override
-		protected long getRefreshInterval() {
-			return AbstractActiveBinding.this.getRefreshInterval();
-		}
-
-		@Override
-		protected String getName() {
-			return AbstractActiveBinding.this.getName();
-		}
-
-	}
 	
 }

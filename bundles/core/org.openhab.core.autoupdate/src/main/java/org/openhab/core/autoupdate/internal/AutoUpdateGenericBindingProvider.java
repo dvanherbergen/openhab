@@ -9,7 +9,6 @@
 package org.openhab.core.autoupdate.internal;
 
 import org.apache.commons.lang.StringUtils;
-import org.openhab.core.autoupdate.AutoUpdateBindingProvider;
 import org.openhab.core.binding.BindingConfig;
 import org.openhab.core.items.Item;
 import org.openhab.model.item.binding.AbstractGenericBindingProvider;
@@ -34,7 +33,7 @@ import org.openhab.model.item.binding.BindingConfigParseException;
  * 
  * @since 0.9.1
  */
-public class AutoUpdateGenericBindingProvider extends AbstractGenericBindingProvider implements AutoUpdateBindingProvider {
+public class AutoUpdateGenericBindingProvider extends AbstractGenericBindingProvider {
 
 	/**
 	 * {@inheritDoc}
@@ -73,9 +72,15 @@ public class AutoUpdateGenericBindingProvider extends AbstractGenericBindingProv
 	}
 	
 	/**
-	 * {@inheritDoc}
+	 * Indicates whether an Item with the given <code>itemName</code> is 
+	 * configured to automatically update it's State after receiving a Command
+	 * or not. 
+	 * 
+	 * @param itemName the name of the Item for which to find the configuration
+	 * @return <code>false</code> to disable the automatic update, 
+	 * <code>true</code> to enable the automatic update and <code>null</code>
+	 * if there is no configuration for this item.
 	 */
-	@Override
 	public Boolean autoUpdate(String itemName) {
 		AutoUpdateBindingConfig config = (AutoUpdateBindingConfig) bindingConfigs.get(itemName);
 		return config != null ? config.autoupdate : null;

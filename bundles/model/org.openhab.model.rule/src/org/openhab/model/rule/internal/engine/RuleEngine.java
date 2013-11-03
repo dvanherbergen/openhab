@@ -8,8 +8,6 @@
  */
 package org.openhab.model.rule.internal.engine;
 
-import static org.openhab.core.events.EventConstants.TOPIC_PREFIX;
-import static org.openhab.core.events.EventConstants.TOPIC_SEPERATOR;
 import static org.openhab.model.rule.internal.engine.RuleTriggerManager.TriggerTypes.CHANGE;
 import static org.openhab.model.rule.internal.engine.RuleTriggerManager.TriggerTypes.COMMAND;
 import static org.openhab.model.rule.internal.engine.RuleTriggerManager.TriggerTypes.SHUTDOWN;
@@ -21,6 +19,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.smarthome.core.events.EventSubscriber;
+import org.eclipse.smarthome.core.events.types.SystemEvent;
 import org.eclipse.xtext.naming.QualifiedName;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.Item;
@@ -33,14 +33,11 @@ import org.openhab.core.scriptengine.ScriptEngine;
 import org.openhab.core.scriptengine.ScriptExecutionException;
 import org.openhab.core.scriptengine.ScriptExecutionThread;
 import org.openhab.core.types.Command;
-import org.openhab.core.types.EventType;
 import org.openhab.core.types.State;
 import org.openhab.model.core.ModelRepository;
 import org.openhab.model.core.ModelRepositoryChangeListener;
 import org.openhab.model.rule.rules.Rule;
 import org.openhab.model.rule.rules.RuleModel;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +54,7 @@ import com.google.common.collect.Lists;
  *
  */
 @SuppressWarnings("restriction")
-public class RuleEngine implements EventHandler, ItemRegistryChangeListener, StateChangeListener, ModelRepositoryChangeListener {
+public class RuleEngine implements EventSubscriber, ItemRegistryChangeListener, StateChangeListener, ModelRepositoryChangeListener {
 
 		static private final Logger logger = LoggerFactory.getLogger(RuleEngine.class);
 		
@@ -182,6 +179,7 @@ public class RuleEngine implements EventHandler, ItemRegistryChangeListener, Sta
 			}
 		}
 
+		@Override
 		public void receiveCommand(String itemName, Command command) {
 			if(triggerManager!=null && itemRegistry!=null) {
 				try {
@@ -203,25 +201,7 @@ public class RuleEngine implements EventHandler, ItemRegistryChangeListener, Sta
 			}
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
-		public void handleEvent(Event event) {  
-			String itemName = (String) event.getProperty("item");
-			
-			String topic = event.getTopic();
-			String[] topicParts = topic.split(TOPIC_SEPERATOR);
-			
-			if(!(topicParts.length > 2) || !topicParts[0].equals(TOPIC_PREFIX)) {
-				return; // we have received an event with an invalid topic
-			}
-			String operation = topicParts[1];
-			
-			if(operation.equals(EventType.COMMAND.toString())) {
-				Command command = (Command) event.getProperty("command");
-				if(command!=null) receiveCommand(itemName, command);
-			}
-		}
+
 
 		public void modelChanged(String modelName, org.openhab.model.core.EventType type) {
 			if (triggerManager != null) {
@@ -308,6 +288,16 @@ public class RuleEngine implements EventHandler, ItemRegistryChangeListener, Sta
 		 */
 		private boolean isEnabled() {
 			return !"true".equalsIgnoreCase(System.getProperty("noRules"));
+		}
+
+		@Override
+		public void receiveUpdate(String itemName, State newStatus) {
+			// not used.			
+		}
+
+		@Override
+		public void receiveSystemEvent(SystemEvent systemEvent) {
+			// not used.
 		}
 		
 }

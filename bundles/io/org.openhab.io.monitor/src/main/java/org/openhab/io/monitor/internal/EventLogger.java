@@ -8,13 +8,14 @@
  */
 package org.openhab.io.monitor.internal;
 
-import org.openhab.core.events.AbstractEventSubscriber;
+import org.eclipse.smarthome.core.events.EventSubscriber;
+import org.eclipse.smarthome.core.events.types.SystemEvent;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EventLogger extends AbstractEventSubscriber {
+public class EventLogger implements EventSubscriber {
 
 	static private Logger logger = LoggerFactory.getLogger("runtime.busevents");
 
@@ -24,6 +25,11 @@ public class EventLogger extends AbstractEventSubscriber {
 
 	public void receiveUpdate(String itemName, State newStatus) {
 		logger.info("{} state updated to {}", itemName, newStatus);
+	}
+
+	@Override
+	public void receiveSystemEvent(SystemEvent systemEvent) {
+		logger.debug("'{}' event received for '{}' ", systemEvent.getClass().getSimpleName(), systemEvent.getNode());		
 	}
 
 }

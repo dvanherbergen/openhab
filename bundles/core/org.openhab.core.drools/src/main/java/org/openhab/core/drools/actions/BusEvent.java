@@ -9,8 +9,8 @@
 package org.openhab.core.drools.actions;
 
 
+import org.eclipse.smarthome.core.events.InternalEventPublisher;
 import org.openhab.core.drools.internal.RulesActivator;
-import org.openhab.core.events.InternalEventPublisher;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;

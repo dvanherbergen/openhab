@@ -9,9 +9,9 @@ Bundle-Description: Core of openHAB
 Bundle-License: http://www.eclipse.org/legal/epl-v10.html
 Bundle-SymbolicName: org.eclipse.smarthome.api;singleton:=true
 Bundle-DocURL: http://www.openhab.org
-Export-Package: org.eclipse.smarthome.binding,
- org.eclipse.smarthome.events,
- org.eclipse.smarthome.services.threading,
+Export-Package: org.eclipse.smarthome.api.binding,
+ org.eclipse.smarthome.api.events,
+ org.eclipse.smarthome.api.services.threading,
  org.openhab.core.binding,
  org.openhab.core.items,
  org.openhab.core.library.items,
