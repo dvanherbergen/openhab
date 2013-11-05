@@ -6,6 +6,7 @@ import static org.eclipse.smarthome.core.runtime.internal.events.EventConstants.
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.smarthome.core.events.AbstractEventBus;
 import org.eclipse.smarthome.core.events.types.AbstractBindingEvent;
 import org.eclipse.smarthome.core.events.types.BindingItemConfigEvent;
@@ -72,6 +73,9 @@ public class EventAdminEventBus extends AbstractEventBus implements EventHandler
 			String binding = (String) event.getProperty("binding");
 			String item = (String) event.getProperty("binding");
 			String value = (String) event.getProperty("value");
+			if (StringUtils.isEmpty(value)) {
+				value = null;				
+			}
 			SystemEvent systemEvent = createSystemEvent(type, node, binding, item, value);
 			if (systemEvent != null) {
 				notifySubscribers(systemEvent);
@@ -147,8 +151,8 @@ public class EventAdminEventBus extends AbstractEventBus implements EventHandler
 	private Event createSystemEvent(SystemEvent sysEvent) {
 		Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put("type", sysEvent.getClass().getSimpleName());
-		properties.put("node", sysEvent.getNode());
-		properties.put("value", sysEvent.getValue());
+		properties.put("node", sysEvent.getNode() == null ? "" : sysEvent.getNode());
+		properties.put("value", sysEvent.getValue() == null ? "" : sysEvent.getValue());
 		if (sysEvent instanceof AbstractBindingEvent) {
 			properties.put("binding", ((AbstractBindingEvent) sysEvent).getBindingType());
 		}

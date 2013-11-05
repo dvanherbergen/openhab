@@ -7,7 +7,7 @@ Bundle-Vendor: openHAB.org
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.openhab.io.squeezeserver
 Import-Package: org.apache.commons.lang;version="2.6.0",
- org.openhab.core.events,
+ org.eclipse.smarthome.api.events,
  org.osgi.service.cm;version="1.4.0",
  org.slf4j;version="1.6.4"
 Bundle-DocURL: http://www.openhab.org

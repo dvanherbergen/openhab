@@ -30,9 +30,9 @@
 
 -->
 
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" immediate="true" name="org.eclipse.smarthome.internal.threading.threadpool">
-   <implementation class="org.eclipse.smarthome.internal.threading.ThreadPoolServiceImpl"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" immediate="true" name="org.eclipse.smarthome.core.threadpool">
+   <implementation class="org.eclipse.smarthome.core.internal.threading.ThreadPoolServiceImpl"/>
    <service>
-      <provide interface="org.eclipse.smarthome.services.threading.ThreadPoolService"/>
+      <provide interface="org.eclipse.smarthome.api.services.threading.ThreadPoolService"/>
    </service>
 </scr:component>

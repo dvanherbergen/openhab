@@ -14,6 +14,7 @@
    <reference bind="setEventAdmin" cardinality="1..1" interface="org.osgi.service.event.EventAdmin" name="EventAdmin" policy="dynamic" unbind="unsetEventAdmin"/>
    <service>
       <provide interface="org.eclipse.smarthome.core.events.EventBus"/>
+      <provide interface="org.eclipse.smarthome.core.events.InternalEventPublisher"/>
       <provide interface="org.eclipse.smarthome.api.events.EventPublisher"/>
    </service>
    <reference bind="addEventSubscriber" cardinality="0..n" interface="org.eclipse.smarthome.core.events.EventSubscriber" name="EventSubscriber" policy="dynamic" unbind="removeEventSubscriber"/>

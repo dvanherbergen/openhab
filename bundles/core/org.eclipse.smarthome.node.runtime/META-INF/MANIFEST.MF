@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-Name: openHAB Core Runtime
-Bundle-SymbolicName: org.openhab.core.runtime;singleton:=true
+Bundle-SymbolicName: org.eclipse.smarthome.node.runtime;singleton:=true
 Bundle-Vendor: openHAB.org
 Bundle-Version: 1.4.0.qualifier
 Bundle-ManifestVersion: 2

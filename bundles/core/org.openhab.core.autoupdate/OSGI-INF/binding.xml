@@ -11,11 +11,9 @@
 -->
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.openhab.core.autoupdate">
    <implementation class="org.openhab.core.autoupdate.internal.AutoUpdateBinding"/>
-   <service>
-      <provide interface="org.osgi.service.event.EventHandler"/>
-   </service>
-   <property name="event.topics" type="String" value="openhab/command/*"/>
    
    <reference bind="setItemRegistry" cardinality="1..1" interface="org.openhab.core.items.ItemRegistry" name="ItemRegistry" policy="dynamic" unbind="unsetItemRegistry"/>
-   <reference bind="addBindingProvider" cardinality="1..n" interface="org.openhab.core.autoupdate.AutoUpdateBindingProvider" name="AutoUpdateBindingProvider" policy="dynamic" unbind="removeBindingProvider"/>
+   <service>
+      <provide interface="org.eclipse.smarthome.api.binding.Binding"/>
+   </service>
 </scr:component>

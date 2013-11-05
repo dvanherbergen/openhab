@@ -9,6 +9,7 @@
 package org.openhab.core.autoupdate.internal;
 
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.smarthome.api.binding.Binding;
 import org.eclipse.smarthome.api.binding.BindingConfigException;
@@ -25,8 +26,8 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The AutoUpdate-Binding is no 'normal' binding as it doesn't connect any
  * hardware to openHAB. In fact it takes care of updating the State of an item
- * with respect to the received command automatically or not. By default the
- * State is getting updated automatically which is desired behavior in most of
+ * with respect to the received command automatically or not. 
+ * By default the State is getting updated automatically which is desired behavior in most of
  * the cases. However it could be useful to disable this default behavior.
  * </p>
  * <p>
@@ -35,19 +36,17 @@ import org.slf4j.LoggerFactory;
  * </p>
  * 
  * @author Thomas.Eichstaedt-Engelen
+ * @author Davy Vanherbergen
  * @since 0.9.1
  */
 public class AutoUpdateBinding implements Binding {
 
-	// FIXME this binding is now broken, since it depends on filtering of events, which 
-	// does not work with the binding manager.
-	
 	private static final Logger logger = LoggerFactory.getLogger(AutoUpdateBinding.class);
 
 	protected ItemRegistry itemRegistry;
 
-	private AutoUpdateGenericBindingProvider provider = new AutoUpdateGenericBindingProvider();
-
+	private ConcurrentHashMap<String, Boolean> itemConfigs = new ConcurrentHashMap<>(); 
+	
 	public void setItemRegistry(ItemRegistry itemRegistry) {
 		this.itemRegistry = itemRegistry;
 	}
@@ -57,19 +56,6 @@ public class AutoUpdateBinding implements Binding {
 	}
 
 	/**
-	 * <p>
-	 * Iterates through all registered {@link AutoUpdateBindingProvider}s and
-	 * checks whether an autoupdate configuration is available for
-	 * <code>itemName</code>.
-	 * </p>
-	 * 
-	 * <p>
-	 * If there are more then one {@link AutoUpdateBindingProvider}s providing a
-	 * configuration the results are combined by a logical <em>OR</em>. If no
-	 * configuration is provided at all the autoupdate defaults to
-	 * <code>true</code> and an update is posted for the corresponding
-	 * {@link State}.
-	 * </p>
 	 * 
 	 * @param itemName
 	 *            the item for which to find an autoupdate configuration
@@ -80,7 +66,7 @@ public class AutoUpdateBinding implements Binding {
 	@Override
 	public void processCommand(String itemName, Command command) {
 
-		Boolean autoUpdate = provider.autoUpdate(itemName);
+		Boolean autoUpdate = itemConfigs.get(itemName);
 
 		// we didn't find any autoupdate configuration, so apply the default now
 		if (autoUpdate == null) {
@@ -94,6 +80,17 @@ public class AutoUpdateBinding implements Binding {
 		}
 	}
 
+	@Override
+	public void processItemConfig(String itemName, String itemConfig) throws BindingConfigException {
+		
+		if (itemConfig == null) {
+			itemConfigs.remove(itemName);
+			return;
+		}
+		
+		itemConfigs.put(itemName, Boolean.valueOf(itemConfig));
+	}
+	
 	private void postUpdate(String itemName, State newStatus) {
 		if (itemRegistry != null) {
 			try {
@@ -135,32 +132,22 @@ public class AutoUpdateBinding implements Binding {
 
 	@Override
 	public String getBindingType() {
-		// TODO this won't work for bindings which have no declared configuration
 		return "autoupdate";
 	}
 
 	@Override
 	public void processUpdate(String itemName, State state) {
-		// TODO Auto-generated method stub
-
+		// not used.
 	}
 
 	@Override
 	public void processBindingProperties(Properties config) throws BindingConfigException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void processItemConfig(String itemName, String itemConfig) throws BindingConfigException {
-		// TODO Auto-generated method stub
-
+		// not used
 	}
 
 	@Override
 	public void setEventPublisher(EventPublisher publisher) {
-		// TODO Auto-generated method stub
-
+		// not used.
 	}
 
 }

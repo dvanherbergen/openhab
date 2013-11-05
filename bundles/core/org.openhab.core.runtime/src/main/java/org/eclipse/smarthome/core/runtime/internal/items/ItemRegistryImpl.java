@@ -54,6 +54,7 @@ public class ItemRegistryImpl implements ItemRegistry, ItemsChangeListener {
 	protected Collection<ItemRegistryChangeListener> listeners = new CopyOnWriteArraySet<ItemRegistryChangeListener>();
 
 	public void activate(ComponentContext componentContext) {
+		logger.debug("Starting item registry");
 	}
 	
 	public void deactivate(ComponentContext componentContext) {

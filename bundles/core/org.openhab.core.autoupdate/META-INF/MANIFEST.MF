@@ -11,16 +11,16 @@ Bundle-Description: This is the AutoUpdate binding of the open Home Aut
  omation Bus (openHAB)
 Import-Package: org.apache.commons.lang,
  org.eclipse.smarthome.api.binding,
+ org.eclipse.smarthome.api.events,
  org.openhab.core.binding,
  org.openhab.core.items,
  org.openhab.core.types,
- org.openhab.model.item.binding,
  org.osgi.framework,
  org.slf4j
 Bundle-SymbolicName: org.openhab.core.autoupdate
 Bundle-DocURL: http://www.openhab.org
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Service-Component: OSGI-INF/binding.xml, OSGI-INF/genericbindingprovider.xml
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Service-Component: OSGI-INF/*.xml
 Bundle-ClassPath: .
 
 

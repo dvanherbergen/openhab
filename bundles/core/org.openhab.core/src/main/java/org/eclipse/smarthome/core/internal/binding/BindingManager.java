@@ -97,8 +97,15 @@ public class BindingManager implements EventSubscriber {
 	 *            ScheduledThreadPoolExecutor.
 	 */
 	public void setThreadPoolService(ThreadPoolService threadPoolService) {
-
 		this.scheduledExecutorService = threadPoolService.getScheduledExecutor(ThreadPoolId.SCHEDULED_EXECUTOR_POOL);
+	}
+	
+	/**
+	 * Unsetter for DS.
+	 * @param threadPoolService
+	 */
+	public void unsetThreadPoolService(ThreadPoolService threadPoolService) {
+		this.scheduledExecutorService = null;
 	}
 
 	@Override
@@ -204,4 +211,11 @@ public class BindingManager implements EventSubscriber {
 		}
 	}
 
+	public void setEventPublisher(InternalEventPublisher eventPublisher) {
+		this.eventPublisher = eventPublisher;
+	}
+	public void unsetEventPublisher(InternalEventPublisher eventPublisher) {
+		this.eventPublisher = null;
+	}	
+	
 }

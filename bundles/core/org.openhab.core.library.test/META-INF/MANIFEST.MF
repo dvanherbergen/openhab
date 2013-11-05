@@ -7,4 +7,9 @@ Bundle-Vendor: openHAB.org
 Fragment-Host: org.openhab.core.library
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.junit4;bundle-version="4.8.1"
-Import-Package: junit.framework
+Import-Package: junit.framework,
+ org.eclipse.smarthome.api.events,
+ org.eclipse.smarthome.core.events.types,
+ org.openhab.core.library.items,
+ org.openhab.core.library.types,
+ org.openhab.core.types
