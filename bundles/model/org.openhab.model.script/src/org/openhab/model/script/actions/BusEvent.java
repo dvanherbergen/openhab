@@ -11,7 +11,7 @@ package org.openhab.model.script.actions;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.smarthome.core.events.InternalEventPublisher;
+import org.eclipse.smarthome.core.events.SystemEventPublisher;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
@@ -76,7 +76,7 @@ public class BusEvent {
 	 */
 	static public Object sendCommand(String itemName, String commandString) {
 		ItemRegistry registry = (ItemRegistry) ScriptActivator.itemRegistryTracker.getService();
-		InternalEventPublisher publisher = (InternalEventPublisher) ScriptActivator.eventPublisherTracker.getService();
+		SystemEventPublisher publisher = (SystemEventPublisher) ScriptActivator.eventPublisherTracker.getService();
 		if(publisher!=null && registry!=null) {
 			try {
 				Item item = registry.getItem(itemName);
@@ -96,7 +96,7 @@ public class BusEvent {
 	 * @param command the command to send
 	 */
 	static public Object sendCommand(Item item, Command command) {
-		InternalEventPublisher publisher = (InternalEventPublisher) ScriptActivator.eventPublisherTracker.getService();
+		SystemEventPublisher publisher = (SystemEventPublisher) ScriptActivator.eventPublisherTracker.getService();
 		if (publisher!=null && item != null) {
 			publisher.sendCommand(item.getName(), command);
 		}
@@ -139,7 +139,7 @@ public class BusEvent {
 	 */
 	static public Object postUpdate(String itemName, String stateString) {
 		ItemRegistry registry = (ItemRegistry) ScriptActivator.itemRegistryTracker.getService();
-		InternalEventPublisher publisher = (InternalEventPublisher) ScriptActivator.eventPublisherTracker.getService();
+		SystemEventPublisher publisher = (SystemEventPublisher) ScriptActivator.eventPublisherTracker.getService();
 		if(publisher!=null && registry!=null) {
 			try {
 				Item item = registry.getItem(itemName);
@@ -159,7 +159,7 @@ public class BusEvent {
 	 * @param state the new state of the item
 	 */
 	static public Object postUpdate(Item item, State state) {
-		InternalEventPublisher publisher = (InternalEventPublisher) ScriptActivator.eventPublisherTracker.getService();
+		SystemEventPublisher publisher = (SystemEventPublisher) ScriptActivator.eventPublisherTracker.getService();
 		if (publisher!=null && item != null) {
 			publisher.postUpdate(item.getName(), state);
 		}

@@ -1,4 +1,4 @@
-package org.eclipse.smarthome.api.binding;
+package org.eclipse.smarthome.binding;
 
 /**
  * Interface for active bindings which require a scheduled execution for polling

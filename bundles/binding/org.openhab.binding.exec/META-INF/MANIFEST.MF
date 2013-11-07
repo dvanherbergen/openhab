@@ -10,8 +10,8 @@ Bundle-License: http://www.eclipse.org/legal/epl-v10.html
 Bundle-Description: This is the Exec binding of the open Home Aut
  omation Bus (openHAB)
 Import-Package: org.apache.commons.lang,
- org.eclipse.smarthome.api.binding,
- org.eclipse.smarthome.api.events,
+ org.eclipse.smarthome.binding,
+ org.eclipse.smarthome.events,
  org.osgi.framework,
  org.slf4j
 Bundle-SymbolicName: org.openhab.binding.exec
@@ -20,5 +20,5 @@ Service-Component: OSGI-INF/binding.xml, OSGI-INF/genericbindingprovider.xml
 Bundle-ClassPath: lib/commons-exec-1.1.jar,
  .
 Export-Package: org.openhab.binding.exec
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 

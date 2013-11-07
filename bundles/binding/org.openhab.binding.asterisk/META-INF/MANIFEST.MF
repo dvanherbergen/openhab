@@ -5,11 +5,11 @@ Bundle-SymbolicName: org.openhab.binding.asterisk
 Bundle-Version: 1.4.0.qualifier
 Bundle-Activator: org.openhab.binding.asterisk.internal.AsteriskActivator
 Bundle-Vendor: openHAB.org
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: org.apache.commons.collections,
  org.apache.commons.io,
  org.apache.commons.lang,
- org.eclipse.smarthome.api.events,
+ org.eclipse.smarthome.events,
  org.openhab.core.binding,
  org.openhab.core.items,
  org.openhab.core.library.items,

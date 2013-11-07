@@ -8,7 +8,7 @@
  */
 package org.openhab.core.drools.internal;
 
-import org.eclipse.smarthome.core.events.InternalEventPublisher;
+import org.eclipse.smarthome.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -20,7 +20,7 @@ import org.osgi.util.tracker.ServiceTracker;
 public final class RulesActivator implements BundleActivator {
 
 	public static ServiceTracker<ItemRegistry, ItemRegistry> itemRegistryTracker;
-	public static ServiceTracker<InternalEventPublisher, InternalEventPublisher> eventPublisherTracker;
+	public static ServiceTracker<EventPublisher, EventPublisher> eventPublisherTracker;
 	
 	/**
 	 * Called whenever the OSGi framework starts our bundle
@@ -29,7 +29,7 @@ public final class RulesActivator implements BundleActivator {
 		itemRegistryTracker = new ServiceTracker<ItemRegistry, ItemRegistry>(bc, ItemRegistry.class, null);
 		itemRegistryTracker.open();
 
-		eventPublisherTracker = new ServiceTracker<InternalEventPublisher, InternalEventPublisher>(bc, InternalEventPublisher.class, null);
+		eventPublisherTracker = new ServiceTracker<EventPublisher, EventPublisher>(bc, EventPublisher.class, null);
 		eventPublisherTracker.open();
 }
 

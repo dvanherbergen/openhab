@@ -294,10 +294,4 @@ public class RuleEngine implements EventSubscriber, ItemRegistryChangeListener, 
 		public void receiveUpdate(String itemName, State newStatus) {
 			// not used.			
 		}
-
-		@Override
-		public void receiveSystemEvent(SystemEvent systemEvent) {
-			// not used.
-		}
-		
 }

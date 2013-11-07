@@ -9,13 +9,11 @@
 package org.openhab.ui.webapp.internal.render;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.EList;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.types.State;
-import org.openhab.core.types.UnDefType;
 import org.openhab.model.sitemap.Setpoint;
 import org.openhab.model.sitemap.Widget;
 import org.openhab.ui.webapp.internal.servlet.WebAppServlet;

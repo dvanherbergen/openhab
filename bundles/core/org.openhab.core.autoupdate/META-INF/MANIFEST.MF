@@ -10,8 +10,8 @@ Bundle-License: http://www.eclipse.org/legal/epl-v10.html
 Bundle-Description: This is the AutoUpdate binding of the open Home Aut
  omation Bus (openHAB)
 Import-Package: org.apache.commons.lang,
- org.eclipse.smarthome.api.binding,
- org.eclipse.smarthome.api.events,
+ org.eclipse.smarthome.binding,
+ org.eclipse.smarthome.events,
  org.openhab.core.binding,
  org.openhab.core.items,
  org.openhab.core.types,

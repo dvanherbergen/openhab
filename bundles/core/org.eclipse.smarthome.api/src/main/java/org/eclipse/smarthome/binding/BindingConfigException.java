@@ -1,4 +1,4 @@
-package org.eclipse.smarthome.api.binding;
+package org.eclipse.smarthome.binding;
 
 /**
  * BindingConfigException. Used for signaling errors in the binding

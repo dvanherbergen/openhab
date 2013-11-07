@@ -3,23 +3,20 @@ package org.eclipse.smarthome.core.internal.binding;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-import org.eclipse.smarthome.api.binding.ActiveBinding;
-import org.eclipse.smarthome.api.binding.Binding;
-import org.eclipse.smarthome.api.binding.BindingConfigException;
-import org.eclipse.smarthome.api.services.threading.ThreadPoolId;
-import org.eclipse.smarthome.api.services.threading.ThreadPoolService;
+import org.eclipse.smarthome.binding.ActiveBinding;
+import org.eclipse.smarthome.binding.Binding;
+import org.eclipse.smarthome.binding.BindingConfigException;
 import org.eclipse.smarthome.core.events.EventSubscriber;
-import org.eclipse.smarthome.core.events.InternalEventPublisher;
+import org.eclipse.smarthome.core.events.SystemEventPublisher;
+import org.eclipse.smarthome.core.events.SystemEventSubscriber;
 import org.eclipse.smarthome.core.events.types.AbstractBindingEvent;
 import org.eclipse.smarthome.core.events.types.BindingItemConfigEvent;
 import org.eclipse.smarthome.core.events.types.BindingPropertiesChangedEvent;
 import org.eclipse.smarthome.core.events.types.BindingStatusEvent;
 import org.eclipse.smarthome.core.events.types.BindingStatusEvent.Status;
 import org.eclipse.smarthome.core.events.types.SystemEvent;
+import org.eclipse.smarthome.services.threading.ThreadPoolService;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 import org.slf4j.Logger;
@@ -35,22 +32,19 @@ import org.slf4j.LoggerFactory;
  * SmartHome node.
  * 
  * @author Davy Vanherbergen
- * 
  * @since 1.4.0
  */
-public class BindingManager implements EventSubscriber {
+public class BindingManager implements EventSubscriber, SystemEventSubscriber {
 
 	private static final Logger log = LoggerFactory.getLogger(BindingManager.class);
 
 	private ConcurrentHashMap<String, Binding> bindings = new ConcurrentHashMap<String, Binding>();
 
-	private ConcurrentHashMap<Binding, Future<?>> activeBindingThreads = new ConcurrentHashMap<Binding, Future<?>>();
-
 	private ConcurrentHashMap<Binding, CopyOnWriteArrayList<String>> bindingItems = new ConcurrentHashMap<Binding, CopyOnWriteArrayList<String>>();
 
-	private ScheduledExecutorService scheduledExecutorService;
+	private ThreadPoolService threadPoolService;
 
-	private InternalEventPublisher eventPublisher;
+	private SystemEventPublisher eventPublisher;
 
 	/**
 	 * Remove a binding from the BindingManager. This method is called by DS
@@ -65,13 +59,9 @@ public class BindingManager implements EventSubscriber {
 
 		log.debug("Unregistering '{}' binding", binding.getBindingType());
 
-		Future<?> future = activeBindingThreads.get(binding);
-		if (future != null && !future.isDone()) {
-			future.cancel(true);
-		}
-		activeBindingThreads.remove(binding);
 		bindings.remove(binding.getBindingType());
 		bindingItems.remove(binding);
+		threadPoolService.cancelJobs(binding.getClass().getSimpleName());
 
 		eventPublisher.postSystemEvent(new BindingStatusEvent(binding, Status.REMOVED));
 	}
@@ -86,6 +76,7 @@ public class BindingManager implements EventSubscriber {
 
 		log.debug("Registering '{}' binding", binding.getBindingType());
 		bindings.put(binding.getBindingType(), binding);
+		binding.setEventPublisher(eventPublisher);
 		eventPublisher.postSystemEvent(new BindingStatusEvent(binding, Status.NEW));
 	}
 
@@ -94,18 +85,19 @@ public class BindingManager implements EventSubscriber {
 	 * in bindings.
 	 * 
 	 * @param threadPoolService
-	 *            ScheduledThreadPoolExecutor.
+	 *            threadPoolService.
 	 */
 	public void setThreadPoolService(ThreadPoolService threadPoolService) {
-		this.scheduledExecutorService = threadPoolService.getScheduledExecutor(ThreadPoolId.SCHEDULED_EXECUTOR_POOL);
+		this.threadPoolService = threadPoolService;
 	}
-	
+
 	/**
 	 * Unsetter for DS.
+	 * 
 	 * @param threadPoolService
 	 */
 	public void unsetThreadPoolService(ThreadPoolService threadPoolService) {
-		this.scheduledExecutorService = null;
+		this.threadPoolService = null;
 	}
 
 	@Override
@@ -192,18 +184,17 @@ public class BindingManager implements EventSubscriber {
 			eventPublisher.postSystemEvent(new BindingStatusEvent(binding, Status.PROPERTIES_LOADED));
 
 			// schedule active binding thread...
-
-			if (binding instanceof ActiveBinding && !activeBindingThreads.containsKey(binding)) {
+			String key = binding.getClass().getSimpleName();
+			if (binding instanceof ActiveBinding && !threadPoolService.containsJobs(key)) {
 				final ActiveBinding activeBinding = (ActiveBinding) binding;
-				Future<?> f = scheduledExecutorService.schedule(new Runnable() {
+				threadPoolService.submitRepeating(key, new Runnable() {
 					@Override
 					public void run() {
 						if (activeBinding.isEnabled()) {
 							activeBinding.execute();
 						}
 					}
-				}, activeBinding.getScheduleInterval(), TimeUnit.MILLISECONDS);
-				activeBindingThreads.put(binding, f);
+				}, activeBinding.getScheduleInterval());
 			}
 
 		} catch (BindingConfigException e) {
@@ -211,11 +202,12 @@ public class BindingManager implements EventSubscriber {
 		}
 	}
 
-	public void setEventPublisher(InternalEventPublisher eventPublisher) {
+	public void setEventPublisher(SystemEventPublisher eventPublisher) {
 		this.eventPublisher = eventPublisher;
 	}
-	public void unsetEventPublisher(InternalEventPublisher eventPublisher) {
+
+	public void unsetEventPublisher(SystemEventPublisher eventPublisher) {
 		this.eventPublisher = null;
-	}	
-	
+	}
+
 }

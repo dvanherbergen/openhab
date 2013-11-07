@@ -1,4 +1,4 @@
-package org.eclipse.smarthome.api.events;
+package org.eclipse.smarthome.events;
 
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
@@ -26,4 +26,14 @@ public interface EventPublisher {
 	 */
 	public void postUpdate(String itemName, State newState);
 		
+	/**
+	 * Initiate synchronous sending of a command. This method does not return to
+	 * the caller until all subscribers have processed the command.
+	 * 
+	 * @param itemName
+	 *            name of the item to send the command for
+	 * @param command
+	 *            the command to send
+	 */
+	public void sendCommand(String itemName, Command command);
 }

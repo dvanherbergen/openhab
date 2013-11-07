@@ -19,9 +19,9 @@ Bundle-License: http://www.eclipse.org/legal/epl-v10.html
 Bundle-SymbolicName: org.openhab.core
 Bundle-DocURL: http://www.openhab.org
 Import-Package: org.apache.commons.collections;version="3.2.0",
- org.eclipse.smarthome.api.binding,
- org.eclipse.smarthome.api.events,
- org.eclipse.smarthome.api.services.threading,
+ org.eclipse.smarthome.binding,
+ org.eclipse.smarthome.events,
+ org.eclipse.smarthome.services.threading,
  org.eclipse.smarthome.core.events,
  org.eclipse.smarthome.core.events.types,
  org.openhab.core.items,

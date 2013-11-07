@@ -24,8 +24,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.smarthome.core.events.EventSubscriber;
-import org.eclipse.smarthome.core.events.types.SystemEvent;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
@@ -37,7 +35,6 @@ import org.openhab.core.persistence.FilterCriteria;
 import org.openhab.core.persistence.HistoricItem;
 import org.openhab.core.persistence.PersistenceService;
 import org.openhab.core.persistence.QueryablePersistenceService;
-import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 import org.openhab.core.types.UnDefType;
 import org.openhab.model.core.EventType;
@@ -452,7 +449,7 @@ public class PersistenceManager implements ModelRepositoryChangeListener, ItemRe
 
 						scheduler.scheduleJob(job, quartzTrigger);
 
-						logger.debug("Scheduled strategy {} with cron expression {}", new String[] { jobKey.toString(),
+						logger.debug("Scheduled strategy {} with cron expression {}", new Object[] { jobKey.toString(),
 								cronExpression });
 					} catch (SchedulerException e) {
 						logger.error("Failed to schedule job for strategy {} with cron expression {}", new String[] {

@@ -9,8 +9,8 @@ Bundle-DocURL: http://www.openhab.org
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Service-Component: OSGI-INF/*.xml
 Bundle-ClassPath: .
-Import-Package: org.eclipse.smarthome.api.binding,
- org.eclipse.smarthome.api.events,
+Import-Package: org.eclipse.smarthome.binding,
+ org.eclipse.smarthome.events,
  org.eclipse.smarthome.core.events,
  org.eclipse.smarthome.core.events.types,
  org.openhab.core.types,

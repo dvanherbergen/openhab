@@ -7,11 +7,39 @@ package org.eclipse.smarthome.core.events;
  * based event bus.
  * 
  * @author Davy Vanherbergen
+ * @since 1.4.0
  */
-public interface EventBus extends InternalEventPublisher {
+public interface EventBus extends SystemEventPublisher {
 
+	/**
+	 * Used by Declarative Services to add any published EventSubscriber.
+	 * 
+	 * @param subscriber
+	 *            to add.
+	 */
 	public void addEventSubscriber(EventSubscriber subscriber);
 
+	/**
+	 * Used by Declarative Services to remove a published EventSubscriber.
+	 * 
+	 * @param subscriber
+	 *            to remove.
+	 */
 	public void removeEventSubscriber(EventSubscriber subscriber);
 
+	/**
+	 * Used by Declarative Services to add any published SystemEventSubscriber.
+	 * 
+	 * @param subscriber
+	 *            to add.
+	 */
+	public void addSystemEventSubscriber(SystemEventSubscriber subscriber);
+
+	/**
+	 * Used by Declarative Services to remove a published SystemEventSubscriber.
+	 * 
+	 * @param subscriber
+	 *            to remove.
+	 */
+	public void removeSystemEventSubscriber(SystemEventSubscriber subscriber);
 }

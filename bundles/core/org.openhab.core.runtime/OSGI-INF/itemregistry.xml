@@ -15,5 +15,5 @@
    <service>
       <provide interface="org.openhab.core.items.ItemRegistry"/>
    </service>
-   <reference bind="setEventPublisher" cardinality="0..1" interface="org.eclipse.smarthome.api.events.EventPublisher" name="EventPublisher" policy="dynamic" unbind="unsetEventPublisher"/>
+   <reference bind="setEventPublisher" cardinality="0..1" interface="org.eclipse.smarthome.events.EventPublisher" name="EventPublisher" policy="dynamic" unbind="unsetEventPublisher"/>
 </scr:component>

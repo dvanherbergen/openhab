@@ -33,7 +33,6 @@ import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 import org.eclipse.smarthome.core.events.EventSubscriber;
-import org.eclipse.smarthome.core.events.types.SystemEvent;
 import org.openhab.core.drools.event.CommandEvent;
 import org.openhab.core.drools.event.RuleEvent;
 import org.openhab.core.drools.event.StateEvent;
@@ -325,11 +324,6 @@ public class RuleService extends AbstractActiveService implements ManagedService
 	@Override
 	public void receiveUpdate(String itemName, State newStatus) {
 		// don't care about states
-	}
-
-	@Override
-	public void receiveSystemEvent(SystemEvent systemEvent) {
-		// don't care about system events
 	}
 
 }

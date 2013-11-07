@@ -9,7 +9,6 @@
 package org.eclipse.smarthome.core.runtime.internal.items;
 
 import org.eclipse.smarthome.core.events.EventSubscriber;
-import org.eclipse.smarthome.core.events.types.SystemEvent;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
@@ -103,11 +102,6 @@ public class ItemUpdater implements EventSubscriber {
 				logger.debug("Received command for non-existing item: {}", e.getMessage());
 			}
 		}
-	}
-
-	@Override
-	public void receiveSystemEvent(SystemEvent systemEvent) {
-		// nothing to do..
 	}
 
 }

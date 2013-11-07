@@ -9,31 +9,31 @@
 package org.eclipse.smarthome.core.internal.threading;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.smarthome.api.services.threading.ThreadPoolId;
-import org.eclipse.smarthome.api.services.threading.ThreadPoolService;
+import org.eclipse.smarthome.services.threading.ThreadPoolService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Factory for requesting thread pools. To create a thread pool it's sufficient
- * to request a new executor from this service. ThreadPool properties can be defined
- * using system properties in the following format (where [name] is the name of
- * the pool):<br/>
+ * Service for submitting jobs to be executed in a shared thread pool. There are
+ * 2 thread pools available, a default one for executing jobs immediately and
+ * background one for executing fixed interval repeating jobs. ThreadPool
+ * properties can be defined using system properties:
  * 
- * threadPool.[name].min=XX to define the minimum number of threads in the pool.<br/>
- * threadPool.[name].max=XX to define the maximum number of threads in the pool.<br/>
- * threadPool.[name].keepAlive=XX to define the time to keep a thread alive
- * after it completes its' work.
+ * threadPool.min=XX to define the minimum number of threads in the pool.<br/>
+ * threadPool.max=XX to define the maximum number of threads in the pool.<br/>
+ * threadPool.keepAlive=XX to define the time to keep a thread alive after it
+ * completes its' work.
  * 
- * For the ScheduleThreadPool, the following system property is available
- * <br/>
+ * For the background jobs, the following system property is available <br/>
  * 
  * threadPool.background.size=XX to define the number of threads in the pool.<br/>
  * 
@@ -44,21 +44,35 @@ public class ThreadPoolServiceImpl implements ThreadPoolService {
 
 	private static final Logger log = LoggerFactory.getLogger(ThreadPoolServiceImpl.class);
 
-	private static final int DEFAULT_MIN_POOLSIZE = 2;
+	private static final int DEFAULT_MIN_POOLSIZE = 4;
 
-	private static final int DEFAULT_SCHEDULED_POOLSIZE = 10;
+	private static final int DEFAULT_SCHEDULED_POOLSIZE = 8;
 
-	private static final int DEFAULT_MAX_POOLSIZE = 20;
+	private static final int DEFAULT_MAX_POOLSIZE = 16;
 
-	private static final int DEFAULT_KEEP_ALIVE = 500;
+	private static final int DEFAULT_KEEP_ALIVE = 1000;
 
-	private ConcurrentHashMap<ThreadPoolId, ExecutorService> executorMap = new ConcurrentHashMap<ThreadPoolId, ExecutorService>();
+	private ExecutorService executor;
+
+	private ScheduledExecutorService scheduledExecutor;
+
+	private ConcurrentHashMap<String, CopyOnWriteArrayList<Future<?>>> scheduledJobs = new ConcurrentHashMap<>();
 
 	/**
 	 * Start thread pool service.
 	 */
 	public void activate() {
 		log.debug("Starting thread pool service.");
+
+		int minSize = getSystemProperty("threadPool.min", DEFAULT_MIN_POOLSIZE);
+		int maxSize = getSystemProperty("threadPool.max", DEFAULT_MAX_POOLSIZE);
+		long keepAlive = getSystemProperty("threadPool.keepAlive", DEFAULT_KEEP_ALIVE);
+
+		executor = new ThreadPoolExecutor(minSize, maxSize, keepAlive, TimeUnit.MILLISECONDS,
+				new LinkedBlockingQueue<Runnable>());
+
+		int coreSize = getSystemProperty("threadPool.background.size", DEFAULT_SCHEDULED_POOLSIZE);
+		scheduledExecutor = new ScheduledThreadPoolExecutor(coreSize);
 	}
 
 	/**
@@ -66,60 +80,12 @@ public class ThreadPoolServiceImpl implements ThreadPoolService {
 	 */
 	public void deactivate() {
 		log.debug("Shutting down thread pool service.");
-		for (ExecutorService executor : executorMap.values()) {
+		if (executor != null) {
 			executor.shutdownNow();
 		}
-		executorMap.clear();
-	}
-
-	@Override
-	public synchronized ExecutorService getExecutor(ThreadPoolId id) {
-
-		ExecutorService executor = executorMap.get(id);
-		log.trace("Retrieving executor for {}", id);
-
-		if (id.isScheduledExecutor()) {
-			return null;
+		if (scheduledExecutor != null) {
+			scheduledExecutor.shutdownNow();
 		}
-
-		if (executor == null) {
-
-			int minSize = getSystemProperty("threadPool." + id + ".min", DEFAULT_MIN_POOLSIZE);
-			int maxSize = getSystemProperty("threadPool." + id + ".max", DEFAULT_MAX_POOLSIZE);
-			long keepAlive = getSystemProperty("threadPool." + id + ".keepAlive", DEFAULT_KEEP_ALIVE);
-
-			if (id.isScheduledExecutor()) {
-				executor = new ScheduledThreadPoolExecutor(minSize);
-			} else {
-				executor = new ThreadPoolExecutor(minSize, maxSize, keepAlive, TimeUnit.MILLISECONDS,
-						new LinkedBlockingQueue<Runnable>());
-			}
-
-			executorMap.put(id, executor);
-		}
-
-		return executor;
-	}
-
-	@Override
-	public synchronized ScheduledExecutorService getScheduledExecutor(ThreadPoolId id) {
-
-		ExecutorService executor = executorMap.get(id);
-		log.trace("Retrieving executor for {}", id);
-
-		if (!id.isScheduledExecutor()) {
-			return null;
-		}
-
-		if (executor == null) {
-
-			int coreSize = getSystemProperty("threadPool." + id + ".size", DEFAULT_SCHEDULED_POOLSIZE);
-			executor = new ScheduledThreadPoolExecutor(coreSize);
-			executorMap.put(id, executor);
-
-		}
-
-		return (ScheduledExecutorService) executor;
 	}
 
 	/**
@@ -145,4 +111,36 @@ public class ThreadPoolServiceImpl implements ThreadPoolService {
 		}
 		return defaultValue;
 	}
+
+	@Override
+	public void submit(Runnable task) {
+		executor.submit(task);
+	}
+
+	@Override
+	public void submitRepeating(String key, Runnable task, long interval) {
+		CopyOnWriteArrayList<Future<?>> jobs = scheduledJobs.get(key);
+		if (jobs == null) {
+			jobs = new CopyOnWriteArrayList<>();
+			scheduledJobs.put(key, jobs);
+		}
+		jobs.add(scheduledExecutor.scheduleWithFixedDelay(task, 0, interval, TimeUnit.MILLISECONDS));		
+	}
+
+	@Override
+	public void cancelJobs(String key) {
+		CopyOnWriteArrayList<Future<?>> jobs = scheduledJobs.get(key);
+		if (jobs != null) {
+			for (Future<?> future : jobs) {
+				future.cancel(true);
+			}
+			scheduledJobs.remove(key);
+		}
+	}
+
+	@Override
+	public boolean containsJobs(String key) {
+		return scheduledJobs.containsKey(key);
+	}
+
 }

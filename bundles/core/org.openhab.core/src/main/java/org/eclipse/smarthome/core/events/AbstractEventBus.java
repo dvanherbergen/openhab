@@ -1,11 +1,9 @@
 package org.eclipse.smarthome.core.events;
 
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
 
-import org.eclipse.smarthome.api.services.threading.ThreadPoolId;
-import org.eclipse.smarthome.api.services.threading.ThreadPoolService;
 import org.eclipse.smarthome.core.events.types.SystemEvent;
+import org.eclipse.smarthome.services.threading.ThreadPoolService;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 
@@ -14,12 +12,15 @@ import org.openhab.core.types.State;
  * in a non-blocking fashion.
  * 
  * @author Davy Vanherbergen
+ * @since 1.4.0
  */
 public abstract class AbstractEventBus implements EventBus {
 
 	private CopyOnWriteArrayList<EventSubscriber> subscribers = new CopyOnWriteArrayList<>();
+	
+	private CopyOnWriteArrayList<SystemEventSubscriber> systemSubscribers = new CopyOnWriteArrayList<>();
 
-	private ExecutorService executorService;
+	private ThreadPoolService threadPoolService;
 
 	@Override
 	public final void addEventSubscriber(EventSubscriber subscriber) {
@@ -32,16 +33,27 @@ public abstract class AbstractEventBus implements EventBus {
 	public final void removeEventSubscriber(EventSubscriber subscriber) {
 		subscribers.remove(subscriber);
 	}
+	
+	@Override
+	public final void addSystemEventSubscriber(SystemEventSubscriber subscriber) {
+		if (!systemSubscribers.contains(subscriber)) {
+			systemSubscribers.add(subscriber);
+		}
+	}
+	
+	@Override
+	public final void removeSystemEventSubscriber(SystemEventSubscriber subscriber) {
+		systemSubscribers.remove(subscriber);
+	}
 
 	/**
-	 * Use Declared Services to get the ThreadPoolService and create the
-	 * threadpool for distributing events amongst the event bus subscribers.
+	 * Use Declared Services to get the ThreadPoolService.
 	 * 
 	 * @param threadPoolService
 	 *            System ThreadPoolService
 	 */
 	public void setThreadPoolService(ThreadPoolService threadPoolService) {
-		executorService = threadPoolService.getExecutor(ThreadPoolId.EVENT_EXECUTOR_POOL);
+		this.threadPoolService = threadPoolService;
 	}
 
 	/**
@@ -54,7 +66,7 @@ public abstract class AbstractEventBus implements EventBus {
 	 */
 	protected final void notifySubscribers(final String itemName, final State newStatus) {
 
-		executorService.submit(new Runnable() {
+		threadPoolService.submit(new Runnable() {
 			@Override
 			public void run() {
 				for (EventSubscriber s : subscribers) {
@@ -74,7 +86,7 @@ public abstract class AbstractEventBus implements EventBus {
 	 */
 	protected final void notifySubscribers(final String itemName, final Command command) {
 
-		executorService.submit(new Runnable() {
+		threadPoolService.submit(new Runnable() {
 			@Override
 			public void run() {
 				for (EventSubscriber s : subscribers) {
@@ -103,22 +115,21 @@ public abstract class AbstractEventBus implements EventBus {
 	
 	
 	/**
-	 * Notify all subscribers with the given system event.
+	 * Notify all system event subscribers with the given system event.
 	 * 
 	 * @param sysEvent
 	 *            system event.
 	 */
 	protected final void notifySubscribers(final SystemEvent sysEvent) {
 
-		executorService.submit(new Runnable() {
+		threadPoolService.submit(new Runnable() {
 			@Override
 			public void run() {
-				for (EventSubscriber s : subscribers) {
+				for (SystemEventSubscriber s : systemSubscribers) {
 					s.receiveSystemEvent(sysEvent);
 				}
 			}
 		});
-	}
-	
+	}	
 	
 }

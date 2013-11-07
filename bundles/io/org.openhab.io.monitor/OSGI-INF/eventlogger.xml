@@ -13,5 +13,6 @@
    <implementation class="org.openhab.io.monitor.internal.EventLogger"/>
    <service>
       <provide interface="org.eclipse.smarthome.core.events.EventSubscriber"/>
+      <provide interface="org.eclipse.smarthome.core.events.SystemEventSubscriber"/>
    </service>
 </scr:component>

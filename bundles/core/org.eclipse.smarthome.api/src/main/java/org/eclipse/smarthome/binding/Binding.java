@@ -1,8 +1,8 @@
-package org.eclipse.smarthome.api.binding;
+package org.eclipse.smarthome.binding;
 
 import java.util.Properties;
 
-import org.eclipse.smarthome.api.events.EventPublisher;
+import org.eclipse.smarthome.events.EventPublisher;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 

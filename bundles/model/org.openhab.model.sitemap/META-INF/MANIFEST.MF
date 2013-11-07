@@ -33,5 +33,5 @@ Export-Package: org.openhab.model,
  org.openhab.model.scoping,
  org.openhab.model.formatting
 Service-Component: OSGI-INF/sitemapprovider.xml
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Activator: org.openhab.model.sitemap.internal.SitemapModelActivator

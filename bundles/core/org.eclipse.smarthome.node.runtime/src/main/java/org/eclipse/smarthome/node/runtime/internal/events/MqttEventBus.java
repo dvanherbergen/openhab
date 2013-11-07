@@ -4,7 +4,6 @@ import org.eclipse.smarthome.core.events.AbstractEventBus;
 import org.eclipse.smarthome.core.events.types.SystemEvent;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
-import org.openhab.io.transport.mqtt.MqttService;
 
 /**
  * Mqtt Eventbus. Used for linking SmartHome nodes to the main SmartHome
@@ -14,8 +13,6 @@ import org.openhab.io.transport.mqtt.MqttService;
  */
 public class MqttEventBus extends AbstractEventBus {
 
-	private MqttService mqttService;
-	
 	
 	/**
 	 * Start Mqtt connection and setup default listeners for states and commands.

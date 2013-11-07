@@ -1,6 +1,6 @@
 package org.eclipse.smarthome.core.events.types;
 
-import org.eclipse.smarthome.api.binding.Binding;
+import org.eclipse.smarthome.binding.Binding;
 
 public class BindingStatusEvent extends AbstractBindingEvent {
 

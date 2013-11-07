@@ -10,7 +10,7 @@ Bundle-License: http://www.eclipse.org/legal/epl-v10.html
 Import-Package: com.google.common.base,
  org.apache.commons.lang,
  org.eclipse.osgi.framework.console,
- org.eclipse.smarthome.api.events,
+ org.eclipse.smarthome.events,
  org.openhab.core.items,
  org.openhab.core.scriptengine,
  org.openhab.core.types,
@@ -24,5 +24,5 @@ Bundle-DocURL: http://www.openhab.org
 Originally-Created-By: Apache Maven Bundle Plugin
 Service-Component: OSGI-INF/commandprovider.xml
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.openhab.io.console

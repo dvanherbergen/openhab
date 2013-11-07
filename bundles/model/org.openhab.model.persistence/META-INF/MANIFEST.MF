@@ -23,7 +23,7 @@ Import-Package: org.apache.commons.logging,
  org.eclipse.xtext.xbase.lib,
  org.osgi.framework,
  org.slf4j
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.openhab.model.persistence,
  org.openhab.model.persistence.services,
  org.openhab.model.persistence.persistence,

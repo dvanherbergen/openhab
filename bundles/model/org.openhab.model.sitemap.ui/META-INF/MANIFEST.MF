@@ -20,4 +20,4 @@ Import-Package: org.apache.log4j,
 Export-Package: org.openhab.model.ui.contentassist.antlr,
  org.openhab.model.ui.contentassist
 Bundle-Activator: org.openhab.model.ui.internal.SitemapActivator
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

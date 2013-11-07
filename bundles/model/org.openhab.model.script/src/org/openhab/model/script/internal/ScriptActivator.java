@@ -8,7 +8,7 @@
  */
 package org.openhab.model.script.internal;
 
-import org.eclipse.smarthome.core.events.InternalEventPublisher;
+import org.eclipse.smarthome.core.events.SystemEventPublisher;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.scriptengine.ScriptEngine;
 import org.openhab.core.scriptengine.action.ActionService;
@@ -26,7 +26,7 @@ import org.osgi.util.tracker.ServiceTracker;
 public class ScriptActivator implements BundleActivator {
 	
 	public static ServiceTracker<ItemRegistry, ItemRegistry> itemRegistryTracker;
-	public static ServiceTracker<InternalEventPublisher, InternalEventPublisher> eventPublisherTracker;
+	public static ServiceTracker<SystemEventPublisher, SystemEventPublisher> eventPublisherTracker;
 	public static ServiceTracker<ModelRepository, ModelRepository> modelRepositoryTracker;
 	public static ServiceTracker<ScriptEngine, ScriptEngine> scriptEngineTracker;
 	public static ServiceTracker<ActionService, ActionService> actionServiceTracker;
@@ -41,7 +41,7 @@ public class ScriptActivator implements BundleActivator {
 		itemRegistryTracker = new ServiceTracker<ItemRegistry, ItemRegistry>(bc, ItemRegistry.class, null);
 		itemRegistryTracker.open();
 
-		eventPublisherTracker = new ServiceTracker<InternalEventPublisher, InternalEventPublisher>(bc, InternalEventPublisher.class, null);
+		eventPublisherTracker = new ServiceTracker<SystemEventPublisher, SystemEventPublisher>(bc, SystemEventPublisher.class, null);
 		eventPublisherTracker.open();
 
 		modelRepositoryTracker = new ServiceTracker<ModelRepository, ModelRepository>(bc, ModelRepository.class, null);

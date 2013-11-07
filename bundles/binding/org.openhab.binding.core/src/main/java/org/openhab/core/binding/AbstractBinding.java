@@ -3,8 +3,8 @@ package org.openhab.core.binding;
 import java.util.List;
 import java.util.Properties;
 
-import org.eclipse.smarthome.api.binding.BindingConfigException;
-import org.eclipse.smarthome.api.events.EventPublisher;
+import org.eclipse.smarthome.binding.BindingConfigException;
+import org.eclipse.smarthome.events.EventPublisher;
 import org.openhab.core.items.Item;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;

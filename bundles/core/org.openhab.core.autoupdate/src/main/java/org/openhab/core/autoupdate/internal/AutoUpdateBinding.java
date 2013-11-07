@@ -11,9 +11,9 @@ package org.openhab.core.autoupdate.internal;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.eclipse.smarthome.api.binding.Binding;
-import org.eclipse.smarthome.api.binding.BindingConfigException;
-import org.eclipse.smarthome.api.events.EventPublisher;
+import org.eclipse.smarthome.binding.Binding;
+import org.eclipse.smarthome.binding.BindingConfigException;
+import org.eclipse.smarthome.events.EventPublisher;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;

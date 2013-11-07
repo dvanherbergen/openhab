@@ -11,7 +11,7 @@ package org.openhab.io.console;
 import java.util.Collection;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.eclipse.smarthome.api.events.EventPublisher;
+import org.eclipse.smarthome.events.EventPublisher;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemNotUniqueException;

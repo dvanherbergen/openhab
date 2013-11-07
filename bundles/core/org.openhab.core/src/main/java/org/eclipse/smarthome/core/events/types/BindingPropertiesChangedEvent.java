@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.eclipse.smarthome.api.binding.BindingConfigException;
+import org.eclipse.smarthome.binding.BindingConfigException;
 
 public class BindingPropertiesChangedEvent extends SystemEvent {
 

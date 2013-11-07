@@ -1,4 +1,4 @@
-package org.eclipse.smarthome.api.binding;
+package org.eclipse.smarthome.binding;
 
 /**
  * This is a simple marker interface to define data structures that are

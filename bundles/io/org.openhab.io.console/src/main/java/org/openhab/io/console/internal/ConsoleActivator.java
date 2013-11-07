@@ -8,7 +8,7 @@
  */
 package org.openhab.io.console.internal;
 
-import org.eclipse.smarthome.api.events.EventPublisher;
+import org.eclipse.smarthome.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.scriptengine.ScriptEngine;
 import org.osgi.framework.BundleActivator;

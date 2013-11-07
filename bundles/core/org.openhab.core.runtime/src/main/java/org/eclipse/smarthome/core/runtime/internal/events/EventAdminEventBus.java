@@ -85,13 +85,16 @@ public class EventAdminEventBus extends AbstractEventBus implements EventHandler
 
 	private SystemEvent createSystemEvent(String type, String node, String binding, String item, String value) {
 
-		SystemEvent sysEvent = null;
 		// TODO implement all options here!
-		switch (type) {
-		case "":
-			return new BindingPropertiesChangedEvent();
+		switch (type) {		
+		case "BindingItemConfigEvent":
+			return new BindingItemConfigEvent(node, type, item, value);
+		case "BindingPropertiesChangedEvent":
+			logger.error("event not implemented");
+			return new BindingPropertiesChangedEvent();			
 		default:
-			return sysEvent;
+			logger.warn("Unrecognized system event: {}", type );
+			return null;
 		}
 
 	}

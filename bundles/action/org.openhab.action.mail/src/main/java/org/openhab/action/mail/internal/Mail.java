@@ -124,7 +124,7 @@ import org.slf4j.LoggerFactory;
 		} else {
 			logger.error("Cannot send e-mail because of missing configuration settings. The current settings are: " +
 					"Host: '{}', port '{}', from '{}', useTLS: {}, username: '{}', password '{}'",
-					new String[] { hostname, String.valueOf(port), from, String.valueOf(tls), username, password} );
+					new Object[] { hostname, String.valueOf(port), from, String.valueOf(tls), username, password} );
 		}
 		
 		return success;

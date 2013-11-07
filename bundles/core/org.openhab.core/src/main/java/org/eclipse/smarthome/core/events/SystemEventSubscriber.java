@@ -28,38 +28,21 @@
  */
 package org.eclipse.smarthome.core.events;
 
-import org.eclipse.smarthome.api.events.EventPublisher;
 import org.eclipse.smarthome.core.events.types.SystemEvent;
-import org.openhab.core.types.Command;
 
 /**
- * An EventPublisher is used to send commands or status or system updates to the
- * openHAB event bus.
- * 
- * The internal event publisher extends the basic event publisher and provides
- * also access for sending system events and synchronous commands.
+ * An EventSubscriber which receives System events from the SmartHome event bus for further processing.
  * 
  * @author Davy Vanherbergen
+ * @since 1.4.0
  */
-public interface InternalEventPublisher extends EventPublisher {
+public interface SystemEventSubscriber {
 
 	/**
-	 * Initiate synchronous sending of a command. This method does not return to
-	 * the caller until all subscribers have processed the command.
+	 * Callback method if a system event was sent on the event bus.
 	 * 
-	 * @param itemName
-	 *            name of the item to send the command for
-	 * @param command
-	 *            the command to send
+	 * @param systemEvent event which was sent.
 	 */
-	public void sendCommand(String itemName, Command command);
-
-	/**
-	 * Post a system event to the event bus.
-	 * 
-	 * @param event
-	 *            the system event which occurred.
-	 */
-	public void postSystemEvent(SystemEvent event);
-
+	public void receiveSystemEvent(SystemEvent systemEvent);
+	
 }

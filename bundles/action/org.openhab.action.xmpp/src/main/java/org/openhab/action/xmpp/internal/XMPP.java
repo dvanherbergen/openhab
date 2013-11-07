@@ -125,7 +125,7 @@ public class XMPP {
 					InputStream is = url.openStream();
 					OutgoingFileTransfer.setResponseTimeout(10000);
 					transfer.sendStream(is, url.getFile(), is.available(), message);
-					logger.debug("Sent message '{}' with attachment '{}' to '{}'.", new String[] { message, attachmentUrl, to });
+					logger.debug("Sent message '{}' with attachment '{}' to '{}'.", new Object[] { message, attachmentUrl, to });
 					is.close();
 					success = true;
 				} catch (IOException e) {
