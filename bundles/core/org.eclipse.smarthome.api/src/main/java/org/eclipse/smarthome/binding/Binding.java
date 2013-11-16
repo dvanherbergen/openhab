@@ -3,6 +3,7 @@ package org.eclipse.smarthome.binding;
 import java.util.Properties;
 
 import org.eclipse.smarthome.events.EventPublisher;
+import org.openhab.core.items.Item;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 
@@ -67,13 +68,16 @@ public interface Binding {
 	 * 
 	 * @param itemName
 	 *            name of the item for which to process the configuration.
+	 * @param itemType
+	 *            item type in the *.items configuration file.
+	 * 
 	 * @param itemConfig
 	 *            configuration string or null if the item was removed.
 	 * @throws BindingConfigException
 	 *             when the configuration string is invalid or when the binding
 	 *             cannot/does not provide a binding for the item.
 	 */
-	public void processItemConfig(String itemName, String itemConfig) throws BindingConfigException;
+	public void processItemConfig(String itemName, Class<? extends Item> itemType, String itemConfig) throws BindingConfigException;
 
 	/**
 	 * Sets an EventPublisher on the binding which can be used for sending

@@ -8,8 +8,8 @@
  */
 package org.openhab.core.transform.internal.service;
 
-import org.openhab.core.transform.TransformationException;
-import org.openhab.core.transform.TransformationService;
+import org.eclipse.smarthome.services.transform.TransformationException;
+import org.eclipse.smarthome.services.transform.TransformationService;
 import org.openhab.io.net.exec.ExecUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * @author Pauli Anttila
  * @since 1.3.0
  */
-public class ExecTransformationService implements TransformationService {
+public class ExecTransformationService implements org.eclipse.smarthome.services.transform.TransformationService {
 
 	static final Logger logger = 
 		LoggerFactory.getLogger(ExecTransformationService.class);

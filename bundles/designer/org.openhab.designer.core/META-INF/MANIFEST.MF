@@ -11,5 +11,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: org.openhab.designer.core,
  org.openhab.designer.core.config
-Import-Package: org.openhab.config.core,
+Import-Package: org.eclipse.smarthome.config,
+ org.openhab.config.core,
  org.slf4j

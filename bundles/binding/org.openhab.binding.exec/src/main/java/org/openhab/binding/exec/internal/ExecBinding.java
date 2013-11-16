@@ -12,9 +12,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,8 +26,12 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang.StringUtils;
-import org.openhab.binding.exec.ExecBindingProvider;
-import org.openhab.core.binding.AbstractActiveBinding;
+import org.eclipse.smarthome.binding.ActiveBinding;
+import org.eclipse.smarthome.binding.BindingConfigException;
+import org.eclipse.smarthome.events.EventPublisher;
+import org.eclipse.smarthome.services.transform.TransformationException;
+import org.eclipse.smarthome.services.transform.TransformationHelper;
+import org.eclipse.smarthome.services.transform.TransformationService;
 import org.openhab.core.items.Item;
 import org.openhab.core.library.items.ContactItem;
 import org.openhab.core.library.items.NumberItem;
@@ -38,17 +42,12 @@ import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.OpenClosedType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.library.types.StringType;
-import org.openhab.core.transform.TransformationException;
-import org.openhab.core.transform.TransformationHelper;
-import org.openhab.core.transform.TransformationService;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 import org.openhab.core.types.TypeParser;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-//import sun.tools.jar.CommandLine;
+
 
 /**
  * The swiss army knife binding which executes given commands on the commandline.
@@ -63,7 +62,7 @@ import org.slf4j.LoggerFactory;
  * @author Pauli Anttila  
  * @since 0.6.0
  */
-public class ExecBinding extends AbstractActiveBinding<ExecBindingProvider> implements ManagedService {
+public class ExecBinding implements ActiveBinding {
 
 	private static final Logger logger = LoggerFactory.getLogger(ExecBinding.class);
 	
@@ -81,25 +80,12 @@ public class ExecBinding extends AbstractActiveBinding<ExecBindingProvider> impl
 
 	/** RegEx to extract a parse a function String <code>'(.*?)\((.*)\)'</code> */
 	private static final Pattern EXTRACT_FUNCTION_PATTERN = Pattern.compile("(.*?)\\((.*)\\)");
-		
-	@Override
-	protected long getRefreshInterval() {
-		return granularity;
-	}
-
-	@Override
-	protected String getName() {
-		return "Exec Refresh Service";
-	}
-
-	@Override
-	public void activate() {
-		super.activate();
-		setProperlyConfigured(true);
-	}
+	
+	private ExecGenericBindingProvider provider = new ExecGenericBindingProvider();
+	
+	private EventPublisher eventPublisher;
 	
 	public void execute() {
-		for (ExecBindingProvider provider : providers) {
 			for (String itemName : provider.getInBindingItemNames()) {
 				
 				String commandLine = provider.getCommandLine(itemName);
@@ -165,7 +151,6 @@ public class ExecBinding extends AbstractActiveBinding<ExecBindingProvider> impl
 					lastUpdateMap.put(itemName, System.currentTimeMillis());
 				}					
 			}
-		}
 	}
 	
 	/**
@@ -220,19 +205,9 @@ public class ExecBinding extends AbstractActiveBinding<ExecBindingProvider> impl
 		}
 	}
 
-	/**
-	 * @{inheritDoc}
-	 */
+
 	@Override
-	public void internalReceiveCommand(String itemName, Command command) {
-		
-		ExecBindingProvider provider = 
-			findFirstMatchingBindingProvider(itemName, command);
-		
-		if (provider == null) {
-			logger.warn("doesn't find matching binding provider [itemName={}, command={}]", itemName, command);
-			return;
-		}
+	public void processCommand(String itemName, Command command) {
 		
 		String commandLine = provider.getCommandLine(itemName, command);
 		
@@ -248,46 +223,7 @@ public class ExecBinding extends AbstractActiveBinding<ExecBindingProvider> impl
 		}
 	}
 	
-	/**
-	 * Find the first matching {@link ExecBindingProvider} according to 
-	 * <code>itemName</code> and <code>command</code>. If no direct match is
-	 * found, a second match is issued with wilcard-command '*'. 
-	 * 
-	 * @param itemName
-	 * @param command
-	 * 
-	 * @return the matching binding provider or <code>null</code> if no binding
-	 * provider could be found
-	 */
-	private ExecBindingProvider findFirstMatchingBindingProvider(String itemName, Command command) {
-		
-		ExecBindingProvider firstMatchingProvider = null;
-		
-		for (ExecBindingProvider provider : this.providers) {
-			
-			String commandLine = provider.getCommandLine(itemName, command);
-			
-			if (commandLine != null) {
-				firstMatchingProvider = provider;
-				break;
-			}
-		}
 
-		// we didn't find an exact match. probably one configured a fallback
-		// command?
-		if (firstMatchingProvider == null) {
-			for (ExecBindingProvider provider : this.providers) {
-				
-				String commandLine = provider.getCommandLine(itemName, WILDCARD_COMMAND_KEY);
-				if (commandLine != null) {
-					firstMatchingProvider = provider;
-					break;
-				}
-			}
-		}
-		
-		return firstMatchingProvider;
-	}
 
 	/**
 	 * <p>Executes <code>commandLine</code>. Sometimes (especially observed on 
@@ -384,8 +320,7 @@ public class ExecBinding extends AbstractActiveBinding<ExecBindingProvider> impl
 	}
 
 	@Override
-	@SuppressWarnings("rawtypes")
-	public void updated(Dictionary config) throws ConfigurationException {
+	public void processBindingProperties(Properties config) throws BindingConfigException {
 		
 		if (config != null) {
 			String timeoutString = (String) config.get("timeout");
@@ -401,11 +336,35 @@ public class ExecBinding extends AbstractActiveBinding<ExecBindingProvider> impl
 		
 	}
 
+
 	@Override
-	public void addBindingProvider(ExecBindingProvider provider) {
-		super.addBindingProvider(provider);
+	public String getBindingType() {
+		return "exec";
+	}
+
+	@Override
+	public void processUpdate(String itemName, State state) {
+		// TODO Auto-generated method stub
 		
-		
-		setProperlyConfigured(true);
+	}
+
+	@Override
+	public void processItemConfig(String itemName, Class<? extends Item> itemType, String itemConfig) throws BindingConfigException {
+		provider.processBindingConfiguration(itemName, itemType, itemConfig);
+	}
+
+	@Override
+	public void setEventPublisher(EventPublisher publisher) {
+		eventPublisher = publisher;
+	}
+
+	@Override
+	public long getScheduleInterval() {
+		return granularity;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 }

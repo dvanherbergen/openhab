@@ -19,6 +19,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.smarthome.services.threading.ThreadPoolService;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,8 +59,8 @@ public class ThreadPoolServiceImpl implements ThreadPoolService {
 
 	private ScheduledExecutorService scheduledExecutor;
 
-	private ConcurrentHashMap<String, CopyOnWriteArrayList<Future<?>>> scheduledJobs = new ConcurrentHashMap<>();
-
+	private ConcurrentHashMap<BundleContext, CopyOnWriteArrayList<Future<?>>> scheduledJobs = new ConcurrentHashMap<>();
+	
 	/**
 	 * Start thread pool service.
 	 */
@@ -113,34 +116,64 @@ public class ThreadPoolServiceImpl implements ThreadPoolService {
 	}
 
 	@Override
-	public void submit(Runnable task) {
-		executor.submit(task);
+	public void submit(Runnable job) {
+		executor.submit(job);
 	}
 
 	@Override
-	public void submitRepeating(String key, Runnable task, long interval) {
-		CopyOnWriteArrayList<Future<?>> jobs = scheduledJobs.get(key);
+	public void submitDelayed(final BundleContext context, Runnable job, long delay) {		
+		CopyOnWriteArrayList<Future<?>> jobs = scheduledJobs.get(context);
 		if (jobs == null) {
 			jobs = new CopyOnWriteArrayList<>();
-			scheduledJobs.put(key, jobs);
+			scheduledJobs.put(context, jobs);
 		}
-		jobs.add(scheduledExecutor.scheduleWithFixedDelay(task, 0, interval, TimeUnit.MILLISECONDS));		
+		jobs.add(scheduledExecutor.schedule(job, delay, TimeUnit.MILLISECONDS));	
+		
+		// cancel job when originating bundle is stopped
+		context.addBundleListener(new BundleListener() {			
+			@Override
+			public void bundleChanged(BundleEvent event) {
+				if (event.getType() == BundleEvent.STOPPING) {
+					cancelJobs(context);
+				}
+			}
+		});
+	}
+	
+	@Override
+	public void submitRepeating(final BundleContext context, Runnable job, long interval) {
+		CopyOnWriteArrayList<Future<?>> jobs = scheduledJobs.get(context);
+		if (jobs == null) {
+			jobs = new CopyOnWriteArrayList<>();
+			scheduledJobs.put(context, jobs);
+		}
+		jobs.add(scheduledExecutor.scheduleWithFixedDelay(job, 0, interval, TimeUnit.MILLISECONDS));	
+		
+		// cancel jobs when originating bundle is stopped
+		context.addBundleListener(new BundleListener() {			
+			@Override
+			public void bundleChanged(BundleEvent event) {
+				if (event.getType() == BundleEvent.STOPPING) {
+					cancelJobs(context);
+				}
+			}
+		});
 	}
 
 	@Override
-	public void cancelJobs(String key) {
-		CopyOnWriteArrayList<Future<?>> jobs = scheduledJobs.get(key);
+	public void cancelJobs(BundleContext context) {
+		CopyOnWriteArrayList<Future<?>> jobs = scheduledJobs.get(context);
 		if (jobs != null) {
 			for (Future<?> future : jobs) {
 				future.cancel(true);
 			}
-			scheduledJobs.remove(key);
+			scheduledJobs.remove(context);
 		}
 	}
 
 	@Override
-	public boolean containsJobs(String key) {
-		return scheduledJobs.containsKey(key);
+	public boolean containsJobs(BundleContext context) {
+		return scheduledJobs.containsKey(context);
 	}
 
 }

@@ -16,5 +16,5 @@
       <provide interface="org.eclipse.smarthome.core.events.EventSubscriber"/>
    </service>
    <reference bind="setItemRegistry" cardinality="1..1" interface="org.openhab.core.items.ItemRegistry" name="ItemRegistry" policy="dynamic" unbind="unsetItemRegistry"/>
-   <property name="service.pid" type="String" value="org.openhab.drools"/>
+   <property name="service.pid" type="String" value="org.openhab.drools" />
 </scr:component>

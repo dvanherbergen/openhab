@@ -8,8 +8,10 @@
  */
 package org.openhab.io.monitor.internal;
 
+import org.eclipse.smarthome.core.events.ConfigurationEventSubscriber;
 import org.eclipse.smarthome.core.events.EventSubscriber;
 import org.eclipse.smarthome.core.events.SystemEventSubscriber;
+import org.eclipse.smarthome.core.events.types.ConfigurationEvent;
 import org.eclipse.smarthome.core.events.types.SystemEvent;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
@@ -22,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * @author Kai Kreuzer
  * @author Davy Vanherbergen
  */
-public class EventLogger implements EventSubscriber, SystemEventSubscriber {
+public class EventLogger implements EventSubscriber, SystemEventSubscriber, ConfigurationEventSubscriber {
 
 	static private Logger logger = LoggerFactory.getLogger("runtime.busevents");
 
@@ -38,7 +40,11 @@ public class EventLogger implements EventSubscriber, SystemEventSubscriber {
 
 	@Override
 	public void receiveSystemEvent(SystemEvent systemEvent) {
-		logger.info("'{}' event received for '{}' ", systemEvent.getClass().getSimpleName(), systemEvent.getNode());		
+		logger.info(systemEvent.toString());		
 	}
 
+	@Override
+	public void receiveConfigurationEvent(ConfigurationEvent configEvent) {
+		logger.info(configEvent.toString());		
+	}
 }

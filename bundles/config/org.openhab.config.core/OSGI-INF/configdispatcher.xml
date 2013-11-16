@@ -9,12 +9,14 @@
     http://www.eclipse.org/legal/epl-v10.html
 
 -->
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" name="org.openhab.config.core">
-   <implementation class="org.openhab.config.core.ConfigDispatcher"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" immediate="true" name="org.openhab.config.core">
+   <implementation class="org.eclipse.smarthome.config.ConfigDispatcher"/>
    
    <service>
       <provide interface="org.osgi.service.cm.ManagedService"/>
+      <provide interface="org.eclipse.smarthome.core.events.SystemEventSubscriber"/>
    </service>
    <property name="service.pid" type="String" value="org.openhab.mainconfig"/>
+   <reference bind="setEventPublisher" cardinality="1..1" interface="org.eclipse.smarthome.core.events.ConfigurationEventPublisher" name="ConfigurationEventPublisher" policy="static" unbind="unsetEventPublisher"/>
    
 </scr:component>

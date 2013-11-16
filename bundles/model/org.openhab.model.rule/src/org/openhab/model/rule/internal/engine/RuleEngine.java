@@ -20,7 +20,9 @@ import java.util.List;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.smarthome.core.events.EventSubscriber;
+import org.eclipse.smarthome.core.events.SystemEventSubscriber;
 import org.eclipse.smarthome.core.events.types.SystemEvent;
+import org.eclipse.smarthome.core.events.types.SystemEventType;
 import org.eclipse.xtext.naming.QualifiedName;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.Item;
@@ -54,7 +56,7 @@ import com.google.common.collect.Lists;
  *
  */
 @SuppressWarnings("restriction")
-public class RuleEngine implements EventSubscriber, ItemRegistryChangeListener, StateChangeListener, ModelRepositoryChangeListener {
+public class RuleEngine implements EventSubscriber, ItemRegistryChangeListener, StateChangeListener, ModelRepositoryChangeListener, SystemEventSubscriber {
 
 		static private final Logger logger = LoggerFactory.getLogger(RuleEngine.class);
 		
@@ -89,7 +91,6 @@ public class RuleEngine implements EventSubscriber, ItemRegistryChangeListener, 
 			for(Item item : itemRegistry.getItems()) {
 				internalItemAdded(item);
 			}
-			runStartupRules();
 		}
 		
 		public void deactivate() {
@@ -293,5 +294,12 @@ public class RuleEngine implements EventSubscriber, ItemRegistryChangeListener, 
 		@Override
 		public void receiveUpdate(String itemName, State newStatus) {
 			// not used.			
+		}
+
+		@Override
+		public void receiveSystemEvent(SystemEvent systemEvent) {
+			if (systemEvent.getType() == SystemEventType.SYSTEM_STARTED) {
+				runStartupRules();
+			}			
 		}
 }

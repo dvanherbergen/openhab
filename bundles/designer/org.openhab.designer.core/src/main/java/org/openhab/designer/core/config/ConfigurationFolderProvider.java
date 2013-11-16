@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
-import org.openhab.config.core.ConfigDispatcher;
+import org.eclipse.smarthome.config.ConfigDispatcher;
 import org.openhab.designer.core.CoreActivator;
 import org.openhab.designer.core.DesignerCoreConstants;
 import org.osgi.service.prefs.BackingStoreException;

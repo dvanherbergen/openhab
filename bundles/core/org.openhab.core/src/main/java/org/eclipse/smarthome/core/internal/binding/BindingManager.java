@@ -7,15 +7,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.eclipse.smarthome.binding.ActiveBinding;
 import org.eclipse.smarthome.binding.Binding;
 import org.eclipse.smarthome.binding.BindingConfigException;
+import org.eclipse.smarthome.core.events.ConfigurationEventSubscriber;
 import org.eclipse.smarthome.core.events.EventSubscriber;
 import org.eclipse.smarthome.core.events.SystemEventPublisher;
-import org.eclipse.smarthome.core.events.SystemEventSubscriber;
-import org.eclipse.smarthome.core.events.types.AbstractBindingEvent;
-import org.eclipse.smarthome.core.events.types.BindingItemConfigEvent;
-import org.eclipse.smarthome.core.events.types.BindingPropertiesChangedEvent;
-import org.eclipse.smarthome.core.events.types.BindingStatusEvent;
-import org.eclipse.smarthome.core.events.types.BindingStatusEvent.Status;
+import org.eclipse.smarthome.core.events.types.ConfigurationEvent;
+import org.eclipse.smarthome.core.events.types.ConfigurationEventType;
 import org.eclipse.smarthome.core.events.types.SystemEvent;
+import org.eclipse.smarthome.core.events.types.SystemEventType;
+import org.eclipse.smarthome.core.internal.CoreActivator;
 import org.eclipse.smarthome.services.threading.ThreadPoolService;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
@@ -34,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author Davy Vanherbergen
  * @since 1.4.0
  */
-public class BindingManager implements EventSubscriber, SystemEventSubscriber {
+public class BindingManager implements EventSubscriber, ConfigurationEventSubscriber {
 
 	private static final Logger log = LoggerFactory.getLogger(BindingManager.class);
 
@@ -61,9 +60,8 @@ public class BindingManager implements EventSubscriber, SystemEventSubscriber {
 
 		bindings.remove(binding.getBindingType());
 		bindingItems.remove(binding);
-		threadPoolService.cancelJobs(binding.getClass().getSimpleName());
 
-		eventPublisher.postSystemEvent(new BindingStatusEvent(binding, Status.REMOVED));
+		eventPublisher.postSystemEvent(new SystemEvent(SystemEventType.BINDING_REMOVED, binding.getBindingType()));
 	}
 
 	/**
@@ -77,7 +75,8 @@ public class BindingManager implements EventSubscriber, SystemEventSubscriber {
 		log.debug("Registering '{}' binding", binding.getBindingType());
 		bindings.put(binding.getBindingType(), binding);
 		binding.setEventPublisher(eventPublisher);
-		eventPublisher.postSystemEvent(new BindingStatusEvent(binding, Status.NEW));
+
+		eventPublisher.postSystemEvent(new SystemEvent(SystemEventType.BINDING_ADDED, binding.getBindingType()));
 	}
 
 	/**
@@ -121,30 +120,25 @@ public class BindingManager implements EventSubscriber, SystemEventSubscriber {
 	}
 
 	@Override
-	public void receiveSystemEvent(SystemEvent systemEvent) {
-
-		if (!(systemEvent instanceof AbstractBindingEvent)) {
-			return;
-		}
-
-		AbstractBindingEvent bindingEvent = (AbstractBindingEvent) systemEvent;
-		Binding binding = bindings.get(bindingEvent.getBindingType());
-		if (binding == null) {
-			return;
-		}
+	public void receiveConfigurationEvent(ConfigurationEvent configEvent) {
 
 		try {
 
-			if (systemEvent instanceof BindingPropertiesChangedEvent) {
-				BindingPropertiesChangedEvent propertiesChangedEvent = (BindingPropertiesChangedEvent) systemEvent;
-				configureBindingProperties(binding, propertiesChangedEvent.getProperties());
+			Binding binding = bindings.get(configEvent.getService());
+			if (binding == null) {
 				return;
 			}
 
-			if (systemEvent instanceof BindingItemConfigEvent) {
-				BindingItemConfigEvent itemConfigEvent = (BindingItemConfigEvent) systemEvent;
-				String itemName = itemConfigEvent.getItem();
-				binding.processItemConfig(itemName, systemEvent.getValue());
+			if (configEvent.getType().equals(ConfigurationEventType.SERVICE_CONFIG)) {
+				configureBindingProperties(binding, configEvent.getProperties());
+				return;
+			}
+
+			if (configEvent.getType().equals(ConfigurationEventType.ITEM_CONFIG)) {
+				String itemName = configEvent.getItemName();
+				String configValue = configEvent.getValue();
+				// TODO add item type
+				binding.processItemConfig(itemName, null, configValue);
 
 				CopyOnWriteArrayList<String> items = bindingItems.get(binding);
 				if (items == null) {
@@ -152,12 +146,12 @@ public class BindingManager implements EventSubscriber, SystemEventSubscriber {
 					bindingItems.put(binding, items);
 				}
 
-				if (systemEvent.getValue() == null && items.contains(itemName)) {
+				if (configValue == null && items.contains(itemName)) {
 					// item no longer configured or used
 					items.remove(itemName);
 				}
 
-				if (systemEvent.getValue() != null && !items.contains(itemName)) {
+				if (configValue != null && !items.contains(itemName)) {
 					items.add(itemName);
 				}
 			}
@@ -181,13 +175,12 @@ public class BindingManager implements EventSubscriber, SystemEventSubscriber {
 
 		try {
 			binding.processBindingProperties(config);
-			eventPublisher.postSystemEvent(new BindingStatusEvent(binding, Status.PROPERTIES_LOADED));
+			eventPublisher.postSystemEvent(new SystemEvent(SystemEventType.BINDING_PROPERTIES_LOADED, binding.getBindingType()));
 
 			// schedule active binding thread...
-			String key = binding.getClass().getSimpleName();
-			if (binding instanceof ActiveBinding && !threadPoolService.containsJobs(key)) {
+			if (binding instanceof ActiveBinding && !threadPoolService.containsJobs(CoreActivator.context)) {
 				final ActiveBinding activeBinding = (ActiveBinding) binding;
-				threadPoolService.submitRepeating(key, new Runnable() {
+				threadPoolService.submitRepeating(CoreActivator.context, new Runnable() {
 					@Override
 					public void run() {
 						if (activeBinding.isEnabled()) {

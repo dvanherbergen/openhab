@@ -29,6 +29,7 @@ Export-Package: org.openhab.model,
  org.openhab.model.services,
  org.openhab.model.validation
 Import-Package: org.apache.log4j,
+ org.eclipse.smarthome.config,
  org.eclipse.smarthome.core.events,
  org.eclipse.smarthome.core.events.types,
  org.openhab.core.binding,

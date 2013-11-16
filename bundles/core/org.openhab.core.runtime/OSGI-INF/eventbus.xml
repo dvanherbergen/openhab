@@ -16,9 +16,11 @@
       <provide interface="org.eclipse.smarthome.events.EventPublisher"/>
       <provide interface="org.eclipse.smarthome.core.events.SystemEventPublisher"/>
       <provide interface="org.osgi.service.event.EventHandler"/>
+      <provide interface="org.eclipse.smarthome.core.events.ConfigurationEventPublisher"/>
    </service>
       <property name="event.topics" type="String" value="openhab/*"/>
    <reference bind="addEventSubscriber" cardinality="0..n" interface="org.eclipse.smarthome.core.events.EventSubscriber" name="EventSubscriber" policy="dynamic" unbind="removeEventSubscriber"/>
    <reference bind="addSystemEventSubscriber" cardinality="0..n" interface="org.eclipse.smarthome.core.events.SystemEventSubscriber" name="SystemEventSubscriber" policy="dynamic" unbind="removeSystemEventSubscriber"/>
    <reference bind="setThreadPoolService" cardinality="1..1" interface="org.eclipse.smarthome.services.threading.ThreadPoolService" name="ThreadPoolService" policy="static" unbind="unsetThreadPoolService"/>
+   <reference bind="addConfigurationEventSubscriber" cardinality="0..n" interface="org.eclipse.smarthome.core.events.ConfigurationEventSubscriber" name="ConfigurationEventSubscriber" policy="dynamic" unbind="removeConfigurationEventSubscriber"/>
 </scr:component>

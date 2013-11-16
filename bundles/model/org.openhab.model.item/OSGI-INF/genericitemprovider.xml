@@ -15,7 +15,7 @@
       <provide interface="org.openhab.core.items.ItemProvider"/>
       <provide interface="org.openhab.model.core.ModelRepositoryChangeListener"/>
    </service>
-   <reference bind="setEventPublisher" cardinality="1..1" interface="org.eclipse.smarthome.core.events.SystemEventPublisher" name="InternalEventPublisher" policy="static" unbind="unsetEventPublisher"/>
+   <reference bind="setEventPublisher" cardinality="1..1" interface="org.eclipse.smarthome.core.events.ConfigurationEventPublisher" name="ConfigurationEventPublisher" policy="static" unbind="unsetEventPublisher"/>
    <reference bind="setModelRepository" cardinality="1..1" interface="org.openhab.model.core.ModelRepository" name="ModelRepository" policy="dynamic" unbind="unsetModelRepository"/>
    <reference bind="addItemFactory" cardinality="0..n" interface="org.openhab.core.items.ItemFactory" name="ItemFactory" policy="dynamic" unbind="removeItemFactory"/>
 </scr:component>

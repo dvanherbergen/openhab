@@ -15,6 +15,7 @@ import org.eclipse.smarthome.binding.Binding;
 import org.eclipse.smarthome.binding.BindingConfigException;
 import org.eclipse.smarthome.events.EventPublisher;
 import org.openhab.core.items.GenericItem;
+import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.types.Command;
@@ -81,7 +82,7 @@ public class AutoUpdateBinding implements Binding {
 	}
 
 	@Override
-	public void processItemConfig(String itemName, String itemConfig) throws BindingConfigException {
+	public void processItemConfig(String itemName, Class<? extends Item> itemType, String itemConfig) throws BindingConfigException {
 		
 		if (itemConfig == null) {
 			itemConfigs.remove(itemName);

@@ -22,6 +22,7 @@ sitemap demo label="Main Menu"
 	}
 	Frame label="Demo" {
 		Text label="Group Demo" icon="firstfloor" {
+			Switch item=bindtest
 			Switch item=Lights mappings=[OFF="All Off"]
 			Group item=Heating
 			Group item=Windows

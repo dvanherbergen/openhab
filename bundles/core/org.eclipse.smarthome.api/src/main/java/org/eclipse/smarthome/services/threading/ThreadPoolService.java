@@ -1,5 +1,7 @@
 package org.eclipse.smarthome.services.threading;
 
+import org.osgi.framework.BundleContext;
+
 /**
  * Service for submitting jobs to be executed in a shared thread pool. There are
  * 2 thread pools available, a default one for executing jobs immediately and
@@ -29,35 +31,53 @@ public interface ThreadPoolService {
 	public void submit(Runnable runnable);
 
 	/**
+	 * Submit a job to be run in the shared thread pool after the given delay
+	 * has elapsed.
+	 * 
+	 * @param context
+	 *            BundleContext of the bundle submitting the job. When this
+	 *            bundle is unloaded from the runtime, the submitted job(s) will
+	 *            be cancelled if it still active.
+	 * @param job
+	 *            job to run.
+	 * @param delay
+	 *            delay in milliseconds to wait before starting the job.
+	 */
+	public void submitDelayed(BundleContext context, Runnable job, long delay);
+
+	/**
 	 * Submit a job which should be repeated every x milliseconds.
 	 * 
-	 * @param key
-	 *            identifier which can be used to locate the job(s) afterwards.
-	 *            The same key can be used for multiple jobs.
-	 * @param runnable
+	 * @param context
+	 *            BundleContext of the bundle submitting the job. When this
+	 *            bundle is unloaded from the runtime, the submitted job(s) will
+	 *            be cancelled if it still active.
+	 * @param job
 	 *            job to run.
 	 * @param interval
 	 *            the time in ms between job executions
 	 */
-	public void submitRepeating(String key, Runnable runnable, long interval);
+	public void submitRepeating(BundleContext context, Runnable job, long interval);
 
 	/**
 	 * Cancels all running repeating jobs which were submitted using the given
-	 * key. This method should be called when the calling bundle is
-	 * unloaded.
+	 * bundlecontext. This method will be called automatically when the bundle
+	 * who sumitted a jobs is stopped.
 	 * 
-	 * @param key
-	 *            identifier which was used to submit the jobs.
+	 * @param context
+	 *            BundleContext of the bundle which submitted the jobs to
+	 *            cancel.
 	 */
-	public void cancelJobs(String key);
+	public void cancelJobs(BundleContext context);
 
 	/**
 	 * Checks whether there are any jobs running which were submitted with the
-	 * given identifier.
+	 * given bundle context.
 	 * 
-	 * @param key
-	 *            identifier to check
+	 * @param context
+	 *            BundleContext of the bundle which submitted the jobs.
 	 * @return true if at least one job is there.
 	 */
-	public boolean containsJobs(String key);
+	public boolean containsJobs(BundleContext context);
 }
+

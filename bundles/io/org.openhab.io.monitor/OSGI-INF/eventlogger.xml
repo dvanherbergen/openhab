@@ -14,5 +14,6 @@
    <service>
       <provide interface="org.eclipse.smarthome.core.events.EventSubscriber"/>
       <provide interface="org.eclipse.smarthome.core.events.SystemEventSubscriber"/>
+      <provide interface="org.eclipse.smarthome.core.events.ConfigurationEventSubscriber"/>
    </service>
 </scr:component>

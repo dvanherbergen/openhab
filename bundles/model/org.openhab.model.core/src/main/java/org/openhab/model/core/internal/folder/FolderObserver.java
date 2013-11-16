@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
-import org.openhab.config.core.ConfigDispatcher;
+import org.eclipse.smarthome.config.ConfigDispatcher;
 import org.openhab.model.core.ModelCoreConstants;
 import org.openhab.model.core.ModelRepository;
 import org.openhab.model.core.internal.util.MathUtils;

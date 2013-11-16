@@ -6,12 +6,11 @@ import static org.eclipse.smarthome.core.runtime.internal.events.EventConstants.
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.smarthome.core.events.AbstractEventBus;
-import org.eclipse.smarthome.core.events.types.AbstractBindingEvent;
-import org.eclipse.smarthome.core.events.types.BindingItemConfigEvent;
-import org.eclipse.smarthome.core.events.types.BindingPropertiesChangedEvent;
+import org.eclipse.smarthome.core.events.types.ConfigurationEvent;
+import org.eclipse.smarthome.core.events.types.ConfigurationEventType;
 import org.eclipse.smarthome.core.events.types.SystemEvent;
+import org.eclipse.smarthome.core.events.types.SystemEventType;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 import org.osgi.service.event.Event;
@@ -67,36 +66,27 @@ public class EventAdminEventBus extends AbstractEventBus implements EventHandler
 			return;
 		}
 
+		logger.warn(">>>> {} <<<<", topic);
+		
 		if (operation.equals(EventType.SYSTEM.toString())) {
-			String type = (String) event.getProperty("type");
+			SystemEventType type = (SystemEventType) event.getProperty("type");
 			String node = (String) event.getProperty("node");
-			String binding = (String) event.getProperty("binding");
-			String item = (String) event.getProperty("binding");
+			String service = (String) event.getProperty("service");
+			SystemEvent systemEvent = new SystemEvent(type, node, service);
+			notifySubscribers(systemEvent);
+			return;
+		}
+
+		if (operation.equals(EventType.CONFIG.toString())) {
+			ConfigurationEventType type = (ConfigurationEventType) event.getProperty("type");
+			String node = (String) event.getProperty("node");
+			String service = (String) event.getProperty("service");
+			String item = (String) event.getProperty("item");
 			String value = (String) event.getProperty("value");
-			if (StringUtils.isEmpty(value)) {
-				value = null;				
-			}
-			SystemEvent systemEvent = createSystemEvent(type, node, binding, item, value);
-			if (systemEvent != null) {
-				notifySubscribers(systemEvent);
-			}
+			ConfigurationEvent configEvent = new ConfigurationEvent(type, node,
+					service, item, value);
+			notifySubscribers(configEvent);
 		}
-	}
-
-	private SystemEvent createSystemEvent(String type, String node, String binding, String item, String value) {
-
-		// TODO implement all options here!
-		switch (type) {		
-		case "BindingItemConfigEvent":
-			return new BindingItemConfigEvent(node, type, item, value);
-		case "BindingPropertiesChangedEvent":
-			logger.error("event not implemented");
-			return new BindingPropertiesChangedEvent();			
-		default:
-			logger.warn("Unrecognized system event: {}", type );
-			return null;
-		}
-
 	}
 
 	public void setEventAdmin(EventAdmin eventAdmin) {
@@ -153,15 +143,9 @@ public class EventAdminEventBus extends AbstractEventBus implements EventHandler
 
 	private Event createSystemEvent(SystemEvent sysEvent) {
 		Dictionary<String, Object> properties = new Hashtable<String, Object>();
-		properties.put("type", sysEvent.getClass().getSimpleName());
-		properties.put("node", sysEvent.getNode() == null ? "" : sysEvent.getNode());
-		properties.put("value", sysEvent.getValue() == null ? "" : sysEvent.getValue());
-		if (sysEvent instanceof AbstractBindingEvent) {
-			properties.put("binding", ((AbstractBindingEvent) sysEvent).getBindingType());
-		}
-		if (sysEvent instanceof BindingItemConfigEvent) {
-			properties.put("item", ((BindingItemConfigEvent) sysEvent).getItem());
-		}
+		properties.put("type", sysEvent.getType());
+		properties.put("node", sysEvent.getNode());
+		properties.put("service", sysEvent.getService() == null ? "" : sysEvent.getService());
 		return new Event(createTopic(EventType.SYSTEM, sysEvent.getNode()), properties);
 	}
 
@@ -183,14 +167,31 @@ public class EventAdminEventBus extends AbstractEventBus implements EventHandler
 		return new Event(createTopic(EventType.COMMAND, itemName), properties);
 	}
 
-	private String createTopic(EventType type, String itemName) {
-		return TOPIC_PREFIX + TOPIC_SEPERATOR + type + TOPIC_SEPERATOR + itemName;
+	private String createTopic(EventType type, String subType) {
+		return TOPIC_PREFIX + TOPIC_SEPERATOR + type + TOPIC_SEPERATOR + subType;
 	}
 
 	@Override
 	public void postSystemEvent(SystemEvent event) {
 		if (event != null && eventAdmin != null) {
 			eventAdmin.postEvent(createSystemEvent(event));
+		}
+	}
+
+	private Event createConfigurationEvent(ConfigurationEvent configEvent) {
+		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		properties.put("type", configEvent.getType());
+		properties.put("node", configEvent.getNode());
+		properties.put("service", configEvent.getService() == null ? "" : configEvent.getService());
+		properties.put("item", configEvent.getItemName() == null ? "" : configEvent.getItemName());
+		properties.put("value", configEvent.getValue() == null ? "" : configEvent.getValue());
+		return new Event(createTopic(EventType.CONFIG, configEvent.getNode()), properties);
+	}
+
+	@Override
+	public void postConfigurationEvent(ConfigurationEvent event) {
+		if (event != null && eventAdmin != null) {
+			eventAdmin.postEvent(createConfigurationEvent(event));
 		}
 	}
 }

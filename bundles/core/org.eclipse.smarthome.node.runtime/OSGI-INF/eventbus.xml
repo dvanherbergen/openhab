@@ -12,8 +12,11 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.smarthome.node.runtime.eventbus">
    <implementation class="org.eclipse.smarthome.node.runtime.internal.events.MqttEventBus"/>
    <service>
-      <provide interface="org.eclipse.smarthome.core.events.EventBus"/>
       <provide interface="org.eclipse.smarthome.events.EventPublisher"/>
+      <provide interface="org.eclipse.smarthome.core.events.ConfigurationEventPublisher"/>
+      <provide interface="org.eclipse.smarthome.core.events.SystemEventPublisher"/>
    </service>
    <reference bind="addEventSubscriber" cardinality="0..n" interface="org.eclipse.smarthome.core.events.EventSubscriber" name="EventSubscriber" policy="dynamic" unbind="removeEventSubscriber"/>
+   <reference bind="addConfigurationEventSubscriber" cardinality="0..n" interface="org.eclipse.smarthome.core.events.ConfigurationEventSubscriber" name="ConfigurationEventSubscriber"  policy="dynamic" unbind="removeConfigurationEventSubscriber"/>
+   <reference bind="addSystemEventSubscriber" cardinality="0..n" interface="org.eclipse.smarthome.core.events.SystemEventSubscriber" name="SystemEventSubscriber"  policy="dynamic" unbind="removeSystemEventSubscriber"/>
 </scr:component>

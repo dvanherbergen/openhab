@@ -1,0 +1,1 @@
+Switch bindtest		{ exec="OFF:echo OFF: `date` > /tmp/bindtest.txt, ON:echo ON: `date` > /tmp/bindtest.txt" }

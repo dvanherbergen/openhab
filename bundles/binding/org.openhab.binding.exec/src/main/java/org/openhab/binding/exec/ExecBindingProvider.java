@@ -10,7 +10,6 @@ package org.openhab.binding.exec;
 
 import java.util.List;
 
-import org.openhab.core.binding.BindingProvider;
 import org.openhab.core.items.Item;
 import org.openhab.core.types.Command;
 
@@ -25,7 +24,7 @@ import org.openhab.core.types.Command;
  * @author Pauli Anttila
  * @since 0.6.0
  */
-public interface ExecBindingProvider extends BindingProvider {
+public interface ExecBindingProvider {
 
 	/**
 	 * Returns the Type of the Item identified by {@code itemName}

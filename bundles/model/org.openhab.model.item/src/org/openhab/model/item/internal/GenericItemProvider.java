@@ -14,8 +14,9 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.smarthome.core.events.SystemEventPublisher;
-import org.eclipse.smarthome.core.events.types.BindingItemConfigEvent;
+import org.eclipse.smarthome.core.events.ConfigurationEventPublisher;
+import org.eclipse.smarthome.core.events.types.ConfigurationEvent;
+import org.eclipse.smarthome.core.events.types.ConfigurationEventType;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.GroupFunction;
 import org.openhab.core.items.GroupItem;
@@ -58,7 +59,7 @@ public class GenericItemProvider implements ItemProvider, ModelRepositoryChangeL
 
 	private Collection<ItemFactory> itemFactorys = new ArrayList<ItemFactory>();
 
-	private SystemEventPublisher eventPublisher;
+	private ConfigurationEventPublisher eventPublisher;
 
 	public GenericItemProvider() {
 		// make sure that the DSL is correctly registered with EMF before we
@@ -66,10 +67,10 @@ public class GenericItemProvider implements ItemProvider, ModelRepositoryChangeL
 		new ItemsStandaloneSetup().createInjectorAndDoEMFRegistration();
 	}
 
-	public void setEventPublisher(SystemEventPublisher eventPublisher) {
+	public void setEventPublisher(ConfigurationEventPublisher eventPublisher) {
 		this.eventPublisher = eventPublisher;
 	}
-	public void unsetEventPublisher(SystemEventPublisher eventPublisher) {
+	public void unsetEventPublisher(ConfigurationEventPublisher eventPublisher) {
 		this.eventPublisher = null;
 	}
 
@@ -286,7 +287,7 @@ public class GenericItemProvider implements ItemProvider, ModelRepositoryChangeL
 	 */
 	private void internalDispatchBindings(String modelName, Item item, EList<ModelBinding> bindings) {
 
-		// TODO add node information
+		// TODO add node information to binding config events
 		
 		boolean hasAutoUpdateConfig = false;
 		
@@ -298,15 +299,15 @@ public class GenericItemProvider implements ItemProvider, ModelRepositoryChangeL
 			}
 			String name = item.getName();
 			String config = binding.getConfiguration();
-			BindingItemConfigEvent itemConfigEvent = new BindingItemConfigEvent(null, bindingType, name, config);
-			eventPublisher.postSystemEvent(itemConfigEvent);
+			ConfigurationEvent itemConfigEvent = new ConfigurationEvent(ConfigurationEventType.ITEM_CONFIG, bindingType, name, config);
+			eventPublisher.postConfigurationEvent(itemConfigEvent);
 
 		}
 		
 		if (!hasAutoUpdateConfig) {
 			// if no autoupdate was configured for the item, we will use a default one.
-			BindingItemConfigEvent itemConfigEvent = new BindingItemConfigEvent(null, "autoupdate", item.getName(), "True");
-			eventPublisher.postSystemEvent(itemConfigEvent);
+			ConfigurationEvent itemConfigEvent = new ConfigurationEvent(ConfigurationEventType.ITEM_CONFIG, "autoupdate", item.getName(), "True");
+			eventPublisher.postConfigurationEvent(itemConfigEvent);
 		}
 	}
 

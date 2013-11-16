@@ -11,8 +11,8 @@ package org.openhab.core.transform.internal.service;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.openhab.core.transform.TransformationException;
-import org.openhab.core.transform.TransformationService;
+import org.eclipse.smarthome.services.transform.TransformationException;
+import org.eclipse.smarthome.services.transform.TransformationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

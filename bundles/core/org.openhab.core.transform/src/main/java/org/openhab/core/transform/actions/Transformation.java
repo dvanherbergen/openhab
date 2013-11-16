@@ -8,9 +8,9 @@
  */
 package org.openhab.core.transform.actions;
 
-import org.openhab.core.transform.TransformationException;
-import org.openhab.core.transform.TransformationHelper;
-import org.openhab.core.transform.TransformationService;
+import org.eclipse.smarthome.services.transform.TransformationException;
+import org.eclipse.smarthome.services.transform.TransformationHelper;
+import org.eclipse.smarthome.services.transform.TransformationService;
 import org.openhab.core.transform.internal.TransformationActivator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

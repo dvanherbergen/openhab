@@ -26,37 +26,24 @@
  * (EPL), the licensors of this Program grant you additional permission
  * to convey the resulting work.
  */
-package org.eclipse.smarthome.core.runtime.internal.events;
+package org.eclipse.smarthome.core.events;
+
+import org.eclipse.smarthome.core.events.types.ConfigurationEvent;
 
 /**
- * Due to the duality of some types (which can be states and commands at the
- * same time), we need to be able to differentiate what the meaning of a message
- * on the bus is - does "item ON" mean that its state has changed to ON or that
- * it should turn itself ON? To decide this, we send the event type as an
- * additional information on the event bus for each message.
+ * An EventPublisher used to send configuration events to the SmartHome event bus.
  * 
- * In addition to states and commands, event bus messages can also represent
- * system component state changes or binding configuration changes.
- * 
- * @author Kai Kreuzer
  * @author Davy Vanherbergen
- * @since 0.1.0
+ * @since 1.4.0
  */
-public enum EventType {
-	COMMAND, UPDATE, SYSTEM, CONFIG;
+public interface ConfigurationEventPublisher {
 
-	public String toString() {
-		switch (this) {
-		case COMMAND:
-			return "command";
-		case UPDATE:
-			return "update";
-		case SYSTEM:
-			return "system";
-		case CONFIG:
-			return "config";
-		}
-		return "";
-	}
+	/**
+	 * Post a configuration event to the event bus.
+	 * 
+	 * @param event
+	 *            the configuration event to post.
+	 */
+	public void postConfigurationEvent(ConfigurationEvent event);
 
 }

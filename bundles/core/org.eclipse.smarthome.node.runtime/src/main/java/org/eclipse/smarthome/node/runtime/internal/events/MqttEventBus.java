@@ -1,6 +1,7 @@
 package org.eclipse.smarthome.node.runtime.internal.events;
 
 import org.eclipse.smarthome.core.events.AbstractEventBus;
+import org.eclipse.smarthome.core.events.types.ConfigurationEvent;
 import org.eclipse.smarthome.core.events.types.SystemEvent;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
@@ -44,6 +45,13 @@ public class MqttEventBus extends AbstractEventBus {
 	public void postUpdate(String itemName, State newState) {
 		// TODO Auto-generated method stub
 
+	}
+
+
+	@Override
+	public void postConfigurationEvent(ConfigurationEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -10,9 +10,9 @@ package org.openhab.core.transform.internal;
 
 import junit.framework.Assert;
 
+import org.eclipse.smarthome.services.transform.TransformationException;
 import org.junit.Before;
 import org.junit.Test;
-import org.openhab.core.transform.TransformationException;
 import org.openhab.core.transform.internal.service.XsltTransformationService;
 
 

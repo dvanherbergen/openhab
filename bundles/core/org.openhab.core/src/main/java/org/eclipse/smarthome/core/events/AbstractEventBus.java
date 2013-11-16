@@ -2,6 +2,7 @@ package org.eclipse.smarthome.core.events;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.eclipse.smarthome.core.events.types.ConfigurationEvent;
 import org.eclipse.smarthome.core.events.types.SystemEvent;
 import org.eclipse.smarthome.services.threading.ThreadPoolService;
 import org.openhab.core.types.Command;
@@ -19,6 +20,8 @@ public abstract class AbstractEventBus implements EventBus {
 	private CopyOnWriteArrayList<EventSubscriber> subscribers = new CopyOnWriteArrayList<>();
 	
 	private CopyOnWriteArrayList<SystemEventSubscriber> systemSubscribers = new CopyOnWriteArrayList<>();
+	
+	private CopyOnWriteArrayList<ConfigurationEventSubscriber> configSubscribers = new CopyOnWriteArrayList<>();
 
 	private ThreadPoolService threadPoolService;
 
@@ -44,6 +47,18 @@ public abstract class AbstractEventBus implements EventBus {
 	@Override
 	public final void removeSystemEventSubscriber(SystemEventSubscriber subscriber) {
 		systemSubscribers.remove(subscriber);
+	}
+	
+	@Override
+	public final void addConfigurationEventSubscriber(ConfigurationEventSubscriber subscriber) {
+		if (!configSubscribers.contains(subscriber)) {
+			configSubscribers.add(subscriber);
+		}
+	}
+	
+	@Override
+	public final void removeConfigurationEventSubscriber(ConfigurationEventSubscriber subscriber) {
+		configSubscribers.remove(subscriber);
 	}
 
 	/**
@@ -127,6 +142,25 @@ public abstract class AbstractEventBus implements EventBus {
 			public void run() {
 				for (SystemEventSubscriber s : systemSubscribers) {
 					s.receiveSystemEvent(sysEvent);
+				}
+			}
+		});
+	}	
+	
+	
+	/**
+	 * Notify all system event subscribers with the given configuration event.
+	 * 
+	 * @param event
+	 *            Config event.
+	 */
+	protected final void notifySubscribers(final ConfigurationEvent event) {
+
+		threadPoolService.submit(new Runnable() {
+			@Override
+			public void run() {
+				for (ConfigurationEventSubscriber s : configSubscribers) {
+					s.receiveConfigurationEvent(event);
 				}
 			}
 		});

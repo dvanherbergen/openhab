@@ -17,8 +17,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
-import org.openhab.core.transform.TransformationException;
-import org.openhab.core.transform.TransformationService;
+import org.eclipse.smarthome.services.transform.TransformationException;
+import org.eclipse.smarthome.services.transform.TransformationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;

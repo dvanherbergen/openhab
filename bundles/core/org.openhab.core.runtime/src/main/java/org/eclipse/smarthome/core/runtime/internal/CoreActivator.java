@@ -76,7 +76,7 @@ public class CoreActivator implements BundleActivator {
 		for (Handler handler : handlers) {
 			rootLogger.removeHandler(handler);
 		}
-		
+
 		SLF4JBridgeHandler.install();
 	}
 

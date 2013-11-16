@@ -19,9 +19,9 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.apache.commons.io.IOUtils;
-import org.openhab.config.core.ConfigDispatcher;
-import org.openhab.core.transform.TransformationException;
-import org.openhab.core.transform.TransformationService;
+import org.eclipse.smarthome.config.ConfigDispatcher;
+import org.eclipse.smarthome.services.transform.TransformationException;
+import org.eclipse.smarthome.services.transform.TransformationService;
 import org.openhab.core.transform.internal.TransformationActivator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
