@@ -18,11 +18,11 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import org.atmosphere.cpr.AtmosphereServlet;
-import org.atmosphere.cpr.FrameworkConfig;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.io.net.http.SecureHttpContext;
 import org.openhab.io.rest.internal.resources.ItemResource;
+import org.openhab.io.rest.internal.resources.StateResource;
 import org.openhab.io.rest.internal.resources.RootResource;
 import org.openhab.io.rest.internal.resources.SitemapResource;
 import org.openhab.io.servicediscovery.DiscoveryService;
@@ -67,7 +67,7 @@ public class RESTApplication extends Application {
 	static private ItemUIRegistry itemUIRegistry;
 
 	static private ModelRepository modelRepository;
-
+	
 	public void setHttpService(HttpService httpService) {
 		this.httpService = httpService;
 	}
@@ -178,6 +178,7 @@ public class RESTApplication extends Application {
         Set<Class<?>> result = new HashSet<Class<?>>();
         result.add(RootResource.class);
         result.add(ItemResource.class);
+        result.add(StateResource.class);
         result.add(SitemapResource.class);
         return result;
     }
@@ -219,4 +220,5 @@ public class RESTApplication extends Application {
 		description.servicePort = httpSSLPort;
 		return description;
     }
+
 }
