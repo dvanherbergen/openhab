@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Private-Package: org.openhab.ui.basic.internal
+Ignore-Package: org.openhab.ui.basic.internal
+Bundle-Name: openHAB Basic UI
+Bundle-Vendor: openHAB.org
+Bundle-Version: 1.5.0.qualifier
+Bundle-ManifestVersion: 2
+Bundle-License: http://www.eclipse.org/legal/epl-v10.html
+Bundle-Description: Basic UI Bundle 
+Import-Package: org.codehaus.jackson.map,
+ org.eclipse.jetty.util.component;version="8.1.3",
+ org.eclipse.jetty.websocket;version="8.1.3",
+ org.openhab.core.events,
+ org.openhab.core.items,
+ org.openhab.core.library.types,
+ org.openhab.core.types,
+ org.openhab.io.net.http,
+ org.openhab.ui.items,
+ org.osgi.service.http;version="1.2.1",
+ org.slf4j
+Bundle-SymbolicName: org.openhab.ui.basic;singleton:=true
+Bundle-DocURL: http://www.openhab.org
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Service-Component: OSGI-INF/*.xml
+Require-Bundle: javax.servlet
